@@ -23,10 +23,8 @@ watch($route, () => {
   <footerTab />
 </template>
 
-<style lang='less' scoped>
-body {
-  background-color: #ccc;
-}
+<style lang='less'>
+
 
 // 768px
 @media screen and (max-width: 768px) {

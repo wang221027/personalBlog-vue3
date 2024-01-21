@@ -38,6 +38,8 @@ import '@/permisstion'
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
+// 引入swiper样式
+import 'swiper/css';
 // 将头部组件注册为全局组件
 app.component('Header', Header)
 // 将返回上一级 --- 面包屑注册为全局组件

@@ -203,17 +203,19 @@ onBeforeUnmount(() => {
                 <!-- 列表 -->
                 <ul>
                     <li><router-link to="/HomePage"><img src="./images/logo.png" alt=""></router-link></li>
-                    <li><router-link to="/HomePage"><el-link type="success">首页</el-link></router-link></li>
+                    <li><router-link to="/HomePage"><el-link type="success">简历</el-link></router-link></li>
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
                     <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
-                    <li><router-link to="/game"><el-link type="success">游戏</el-link></router-link></li>
+                    <!-- <li><router-link to="/game"><el-link type="success">游戏</el-link></router-link></li> -->
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
                     <!-- <li><router-link to="/onlineGame"><el-link type="success">联机游戏</el-link></router-link></li> -->
                     <li><el-link type="success">社区</el-link></li>
                     <li>
-                        <el-link type="success">GitHub<el-icon>
-                                <Promotion />
-                            </el-icon></el-link>
+                        <a href="https://github.com/wang221027/vue3-ts-vite.git" target="_blank">
+                            <el-link type="success">GitHub<el-icon>
+                                    <Promotion />
+                                </el-icon></el-link>
+                        </a>
                     </li>
                 </ul>
                 <!-- 搜索框 -->
@@ -252,12 +254,7 @@ onBeforeUnmount(() => {
 .header {
     width: 100%;
     height: 80px;
-
     // 固定定位大盒子
-    .position_fixed:hover {
-        background-color: #fff;
-    }
-
     .position_fixed {
         position: fixed;
         display: flex;
@@ -268,6 +265,7 @@ onBeforeUnmount(() => {
         z-index: 99;
         transition: all .5s;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        background-color: #fff;
 
         // 导航栏
         .nav {
@@ -552,4 +550,5 @@ onBeforeUnmount(() => {
         line-height: 30px;
         font-size: 12px;
     }
-}</style>
+}
+</style>
