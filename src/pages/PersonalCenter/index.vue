@@ -167,10 +167,9 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                 <h1 class="top_h1">{{ nickname }}</h1>
                 <el-row class="top_compile"><el-button round @click="goEditData"><i
                             class="el-icon-edit-outline"></i>编辑资料</el-button></el-row>
-
             </div>
         </div>
-        <div style="margin: 10px 0;">
+        <div style="margin: 10px 95px;display:flex">
             <el-row style="margin-left: 20px;margin-top: 8px;">
                 <label for="file2" class="changeFile">更换头像</label>
                 <input type="file" id="file2" style="display: none;" @change="handleFileUpload">
@@ -179,7 +178,7 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                 <label class="changeFile" @click="quit">退出登录</label>
             </el-row>
         </div>
-        <!-- 个人简历 -->
+        <!-- 个人简介 -->
         <div class="personageResume">个人简介：<h4 class="user_info">{{ userInfo }}</h4>
         </div>
     </div>
@@ -197,8 +196,7 @@ let compile = (id: string, name: string, type: string, alias: string) => {
             <ul>
                 <li v-for="item in userListData" :key="item.id" :style="{}">
                     <div class="title_flex" :style="{
-                        display: userIdCoverData[item.init_id - 1]?.file == 'show' ? 'block' : 'flex'
-                        , height: userIdCoverData[item.init_id - 1]?.file == 'show' ? '280px' : ''
+                        height: userIdCoverData[item.init_id - 1]?.file == 'show' ? '280px' : ''
                     }" v-if="userListData[total - item.init_id] && userListData[total - item.init_id].is_delete == 0">
                         <div class="title_bg" :style="{
                             backgroundImage: item.id === userListData[total - item.init_id]?.id ? `url(${userIdCoverData[item.init_id - 1]?.title_url})` : '',
@@ -221,7 +219,6 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                                 <span>文章类型：{{ item.type }}</span>
                                 <span class="putTime_none">发布日期：{{ item.time }}</span>
                             </div>
-                            <span class="putTime">发布日期：{{ item.time }}</span>
                             <div class="compile">
                                 <!-- 编辑 -->
                                 <el-button type="primary" plain
@@ -267,40 +264,34 @@ let compile = (id: string, name: string, type: string, alias: string) => {
     border-radius: 10px;
     padding: 20px;
     box-sizing: border-box;
-
     // 个人头像
     .el-avatar {
         width: 100px;
         height: 100px;
         border: 2px solid #ccc;
     }
-
     // 用户姓名
     .top_h1 {
         margin-left: 20px;
         margin-top: 20px;
     }
-
     // 编辑资料
     .top_compile {
         margin-left: 86px;
         margin-top: 26px;
     }
-
     // 个人简介
     .personageResume {
         margin-left: 120px;
-        margin-top: -30px;
+        margin-top: 0;
         font-size: 15px;
     }
-
     // 个人简介内容
     .user_info {
         margin-top: 10px;
         font-size: 16px;
     }
 }
-
 // 主体内容
 .main {
     width: 1400px;
@@ -308,14 +299,12 @@ let compile = (id: string, name: string, type: string, alias: string) => {
     padding: 20px;
     display: flex;
     justify-content: space-between;
-
     //左边内容
     .personal {
         flex: 0.38;
         height: 400px;
         background-color: #ccc;
     }
-
     // 列表
     .box {
         width: 850px;
@@ -323,7 +312,6 @@ let compile = (id: string, name: string, type: string, alias: string) => {
         border-radius: 10px;
         padding: 20px;
         flex: 0.6;
-
         ul {
             li {
                 .title_flex {
@@ -332,26 +320,22 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                     border-bottom: 2px solid #ccc;
                     align-items: center;
                 }
-
                 .link-h1,
                 p {
                     cursor: pointer;
                     margin: 8px 0;
                     font-size: 16px;
                 }
-
                 p {
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
                 }
-
                 .link-h1 {
                     font-size: 18px;
                     font-weight: bold;
                     display: inline-block;
                 }
-
                 div {
                     span {
                         display: inline-block;
@@ -359,25 +343,20 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                     }
                 }
             }
-
             li:hover {
                 background: #fafafa;
             }
-
             li:hover .compile {
                 opacity: 1;
             }
-
             .title_flex {
                 display: flex;
                 justify-content: space-between;
             }
-
             .el-col-14 {
                 width: 100%;
                 border-radius: 10px;
             }
-
             .title_bg {
                 width: 180px;
                 height: 100px;
@@ -385,12 +364,10 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                 border: 1px solid #ccc;
                 flex: 0.3;
             }
-
             .title_content {
                 flex: 0.6;
                 overflow: hidden;
                 // 编辑和删除按钮样式
-
                 .compile {
                     float: right;
                     cursor: pointer;
@@ -399,7 +376,6 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                     opacity: 0;
                     margin: 4px 0;
                 }
-
                 /deep/ .el-link__inner {
                     overflow: hidden;
                     display: -webkit-box;
@@ -409,7 +385,6 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                     text-overflow: ellipsis;
                     -o-text-overflow: ellipsis;
                 }
-
                 // 个人简介
                 .title_span {
                     flex-wrap: wrap;
@@ -423,22 +398,21 @@ let compile = (id: string, name: string, type: string, alias: string) => {
         }
     }
 }
-
 .changeFile {
     display: inline-block;
     width: 80px;
     height: 30px;
     line-height: 30px;
     font-size: 14px;
-    border-radius: 22px;
-    border: 1px solid red;
+    background-color: #1C86EE;
+    border-radius: 20px;
     text-align: center;
     cursor: pointer;
+    color: #fff;
 }
 
 // 响应式 1500px
 @media screen and (max-width: 1500px) {
-
     // 上边用户信息、主体
     .content_top,
     .main {
@@ -448,16 +422,17 @@ let compile = (id: string, name: string, type: string, alias: string) => {
 
 // 1300px
 @media screen and (max-width: 1300px) {
-
     // 上边用户信息、主体
     .content_top,
     .main {
         width: 1000px;
     }
-
     // 返回上一级
     .go_back {
         display: none;
+    }
+    .compile {
+        margin-top: 34px !important;
     }
 }
 
@@ -470,10 +445,9 @@ let compile = (id: string, name: string, type: string, alias: string) => {
         width: 900px;
     }
 
-    .putTime_none {
-        display: none !important;
+    .compile {
+        margin-top: 34px;
     }
-
     .putTime {
         font-size: 14px;
     }
@@ -525,7 +499,9 @@ let compile = (id: string, name: string, type: string, alias: string) => {
         margin-left: 51px !important;
         margin-top: 8px !important;
     }
-
+    .title_flex {
+        display: block !important;
+    }
     // 用户头像
     .avatar {
         width: 50px !important;

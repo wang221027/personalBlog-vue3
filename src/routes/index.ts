@@ -5,13 +5,6 @@ export default createRouter({
     history: createWebHashHistory(),
     //管理路由
     routes: [
-        // 首页
-        {
-            name: 'HomePage',
-            path: '/HomePage',
-            component: () => import('@/pages/HomePage/index.vue'),
-            meta: { title: '首页' },
-        },
         // 文章
         {
             name: 'home',
@@ -85,7 +78,7 @@ export default createRouter({
         // 重定向，在项目跑起来的时候，访问/, 立马让他重定向到首页
         {
             path: "/",
-            redirect: "/HomePage"
+            redirect: "/home"
         }
     ],
     //滚动行为:控制滚动条的位置

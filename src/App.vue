@@ -8,11 +8,11 @@ const $route = useRoute()
 // 引入全局事件总线
 import $bus from './utils/event-bus'
 onMounted(() => {
-  $router.push({ name: 'HomePage' })
+  $router.push({ name: 'home' })
 })
 // 监视路由跳转，如果从其他路由跳转到home，通知tabBar组件把高亮调为第一个
 watch($route, () => {
-  if ($route.path == '/HomePage') {
+  if ($route.path == '/home') {
     $bus.emit("isCountOne")
   }
 })

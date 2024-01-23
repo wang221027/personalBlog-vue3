@@ -35,7 +35,7 @@ export default function () {
       times = setTimeout(() => {
         $bus.emit("getUserId");
         $bus.emit("getUserCover");
-        $router.push({ name: "HomePage" });
+        $router.push({ name: "home" });
       }, 1000);
     } else {
       ElMessage({
