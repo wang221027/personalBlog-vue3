@@ -1,16 +1,12 @@
 <script setup lang='ts'>
-import { ref, onMounted, computed, reactive } from "vue"
+import { ref, onMounted, computed } from "vue"
 // 引入api
 import { reqArticle, reqArticleCoverData } from '@/api/home'
 // 引入类型
 import { isArticleData } from '@/api/home/type'
-// 粒子背景
-import particlesOpt from '@/config/particles1'
-import { loadSlim } from "tsparticles-slim"
 // 引入router构造器
 import { useRouter } from 'vue-router'
 const $router = useRouter();
-import { Calendar } from '@element-plus/icons-vue'
 // 文章列表数据
 let articleData: any = ref([])
 // 文章列表是否显示
@@ -27,44 +23,6 @@ let currentPage = ref(1)
 let pageSize = ref(10)
 // 计算是否显示后的总数量
 let totalSplice = ref(0)
-// 轮播图数据
-let bannerList = reactive([
-    {
-        id: 1,
-        content: '精选作品/发布文章'
-    },
-    {
-        id: 2,
-        content: '移动端/电脑端/平板端'
-    },
-    {
-        id: 3,
-        content: '聊天室/私聊'
-    }
-])
-// 粒子背景
-const props = withDefaults(defineProps<{
-    width?: string | number,
-    height?: string | number,
-    backgroundColor?: string,
-    backgroundImage?: string
-}>(), {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#000',
-    backgroundImage: ''
-})
-const particlesContainerStyle = computed(() => {
-    return {
-        width: typeof props.width === 'string' ? props.width : props.width + 'px',
-        height: typeof props.height === 'string' ? props.height : props.height + 'px',
-        backgroundColor: props.backgroundColor,
-        backgroundImage: `url(${props.backgroundImage})`
-    }
-})
-const particlesInit = async (engine: any) => {
-    await loadSlim(engine);
-}
 // 获取文章数据
 const getArticle = async () => {
     const result: isArticleData = await reqArticle();
@@ -122,154 +80,79 @@ onMounted(() => {
 });
 </script>
 <template>
-    <!-- 粒子背景 -->
-    <div class="wft-particles-container" :style="particlesContainerStyle">
-        <vue-particles id="wft-tsparticles" :particlesInit="particlesInit" :options="particlesOpt" />
-    </div>
-    <!-- 标签页 -->
-    <el-tabs type="border-card" class="demo-tabs">
-        <el-tab-pane>
-            <template #label>
-                <span class="custom-tabs-label">
-                    <el-icon>
-                        <calendar />
-                    </el-icon>
-                    <span>Route</span>
-                </span>
-            </template>
-            Route
-        </el-tab-pane>
-        <el-tab-pane label="Config">Config</el-tab-pane>
-        <el-tab-pane label="Role">Role</el-tab-pane>
-        <el-tab-pane label="Task">Task</el-tab-pane>
-    </el-tabs>
     <!-- 主体 -->
-    <div class="main">
-        <div class="flex">
-            <!-- 左边文章 -->
-            <div class="main_left">
-                <!-- 文章列表 -->
-                <ul class="list">
-                    <li v-for="(item) in showDataList" :key="item.id">
-                        <div v-if="isInit && item.is_delete == 0" class="list_flex">
-                            <!-- 封面 -->
-                            <div class="list_left" :style="{
-                                backgroundImage: item.id == articleData[total - item.id].id ? `url(${articleCover[item.id - 1].title_url})` : `none`,
-                                backgroundSize: 'contain',
-                                backgroundPosition: 'center',
-                                backgroundRepeat: 'no-repeat'
-                            }" v-if="isArticleCover && articleCover[item.id - 1].file == 'show'"></div>
-                            <!-- 文章详情 -->
-                            <div class="list_right" v-if="isArticleCover" @click="goArticleCover(item.id)"
-                                :style="{ flex: articleCover[item.id - 1].file == 'show' ? '0.65' : '1' }">
-                                <el-link type="info" class="list_right_title">{{ item.name }}</el-link>
-                                <p class="article">{{ item.alias }}</p>
-                                <div>
-                                    <p>类型：{{ item.type }}</p>
-                                    <p>发布日期：{{ item.time }}</p>
+    <main>
+        <div class="main">
+            <div class="flex">
+                <!-- 左边文章 -->
+                <div class="main_left">
+                    <!-- 文章列表 -->
+                    <ul class="list">
+                        <li v-for="(item) in showDataList" :key="item.id">
+                            <div v-if="isInit && item.is_delete == 0" class="list_flex">
+                                <!-- 封面 -->
+                                <div class="list_left" :style="{
+                                    backgroundImage: item.id == articleData[total - item.id].id ? `url(${articleCover[item.id - 1].title_url})` : `none`,
+                                    backgroundSize: 'contain',
+                                    backgroundPosition: 'center',
+                                    backgroundRepeat: 'no-repeat'
+                                }" v-if="isArticleCover && articleCover[item.id - 1].file == 'show'"></div>
+                                <!-- 文章详情 -->
+                                <div class="list_right" v-if="isArticleCover" @click="goArticleCover(item.id)"
+                                    :style="{ flex: articleCover[item.id - 1].file == 'show' ? '0.65' : '1' }">
+                                    <el-link type="info" class="list_right_title">{{ item.name }}</el-link>
+                                    <p class="article">{{ item.alias }}</p>
+                                    <div>
+                                        <p>类型：{{ item.type }}</p>
+                                        <p>发布日期：{{ item.time }}</p>
+                                    </div>
+                                    <p>作者：{{ item.nickname }}</p>
                                 </div>
-                                <p>作者：{{ item.nickname }}</p>
                             </div>
-                        </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- 右边装饰 -->
+                <div class="main_right">
+                    哈哈哈哈
+                </div>
+            </div>
+            <!-- 分页器 -->
+            <div class="pagination">
+                <ul>
+                    <li><a href="##" @click="currentPage = 1">首页</a></li>
+                    <li><a href="##" @click="currentPage <= 1 ? currentPage = 1 : currentPage--" class="page_top">上一页</a>
+                    </li>
+                    <li v-for="(item, index) in paginationList" :key="index">
+                        <a :class="{ 'active_bgColor': item == currentPage }" href="##" @click="currentPage = item">{{ item
+                        }}</a>
+                    </li>
+                    <li>
+                        <a href="##" @click="currentPage = Math.min(currentPage + 1, Math.ceil(total / pageSize))"
+                            class="page_bottom">下一页</a>
+                    </li>
+                    <li>
+                        <a href="##" @click="currentPage = Math.ceil(totalSplice / pageSize)">尾页</a>
                     </li>
                 </ul>
             </div>
-            <!-- 右边装饰 -->
-            <div class="main_right">
-                <el-carousel :interval="5000" arrow="always">
-                    <el-carousel-item v-for="item in bannerList" :key="item.id">
-                        <h3 text="2xl" justify="center">{{ item.content }}</h3>
-                    </el-carousel-item>
-                </el-carousel>
-            </div>
         </div>
-        <!-- 分页器 -->
-        <div class="pagination">
-            <ul>
-                <li><a href="##" @click="currentPage = 1">首页</a></li>
-                <li><a href="##" @click="currentPage <= 1 ? currentPage = 1 : currentPage--" class="page_top">上一页</a></li>
-                <li v-for="(item, index) in paginationList" :key="index">
-                    <a :class="{ 'active_bgColor': item == currentPage }" href="##" @click="currentPage = item">{{ item
-                    }}</a>
-                </li>
-                <li>
-                    <a href="##" @click="currentPage = Math.min(currentPage + 1, Math.ceil(total / pageSize))"
-                        class="page_bottom">下一页</a>
-                </li>
-                <li>
-                    <a href="##" @click="currentPage = Math.ceil(totalSplice / pageSize)">尾页</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    </main>
+
     <Bottom class="bottom" />
 </template>
 <style lang='less' scoped>
-// 粒子背景
-.wft-particles-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-}
-
-#wft-tsparticles {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-// 标签页
-.demo-tabs {
-    width: 1400px;
-    margin: 10px auto;
-}
-
-.demo-tabs>.el-tabs__content {
-    padding: 32px;
-    color: #6b778c;
-    font-size: 32px;
-    font-weight: 600;
-}
-
-.demo-tabs .custom-tabs-label .el-icon {
-    vertical-align: middle;
-}
-
-.demo-tabs .custom-tabs-label span {
-    vertical-align: middle;
-    margin-left: 4px;
-}
-
-// 轮播图
-.el-carousel__item h3 {
-    color: #475669;
-    opacity: 0.75;
-    line-height: 300px;
-    margin: 0;
-    text-align: center;
-}
-
-.el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-}
-
-.el-carousel__item:nth-child(2n + 1) {
-    background-color: #d3dce6;
-}
-
 // 封装flex样式
 .flex {
     display: flex;
     justify-content: space-between;
 }
-
 // 主体
+main {
+    width: 100%;
+    background-color: #ccc;
+    padding-top: 10px;
+}
 .main {
     width: 1400px;
     margin: 10px auto;
@@ -281,8 +164,7 @@ onMounted(() => {
         .main_left {
             flex: 0.65;
             background-color: #fff;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 10px 20px;
 
             // 文章列表
             .list {
@@ -581,5 +463,4 @@ onMounted(() => {
     .pagination {
         width: 350px !important;
     }
-}
-</style>
+}</style>

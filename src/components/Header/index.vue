@@ -257,7 +257,6 @@ onBeforeUnmount(() => {
 .header {
     width: 100%;
     height: 80px;
-
     // 固定定位大盒子
     .position_fixed {
         position: fixed;

@@ -85,7 +85,6 @@ onMounted(() => {
                 <!-- 发布日期 -->
                 <span>发布日期：{{ ArticleListData[0].time }}</span>
             </div>
-
         </div>
     </div>
 </template>
@@ -93,7 +92,6 @@ onMounted(() => {
 // 容器
 .container {
     width: 100%;
-
     .container_bg {
         position: fixed;
         top: 0;
@@ -105,7 +103,6 @@ onMounted(() => {
         background: url(./images/feng03.webp) no-repeat;
         background-size: cover;
     }
-
     // 主体
     .main {
         width: 1400px;
@@ -113,21 +110,13 @@ onMounted(() => {
         justify-content: space-between;
         margin: 20px auto;
         opacity: .8;
-
         .main_left {
             flex: 0.34;
-
             // 个人头像
             .el-avatar {
                 width: 100px;
                 height: 100px;
                 border: 2px solid #ccc;
-            }
-
-            // 用户姓名
-            .top_h1 {
-                margin-left: 20px;
-                margin-top: 20px;
             }
 
             // 个人头像
@@ -140,9 +129,8 @@ onMounted(() => {
             // 用户姓名
             .top_h1 {
                 margin-left: 20px;
-                margin-top: 20px;
+                margin-top: 10px;
             }
-
             // 左边发布博文背景
             .main_bg {
                 background-color: #fff;
@@ -157,7 +145,6 @@ onMounted(() => {
                 cursor: pointer;
             }
         }
-
         // 右边文章列表
         .main_right {
             padding: 20px;
@@ -183,7 +170,6 @@ onMounted(() => {
 
 // 响应式 1500px
 @media screen and (max-width: 1500px) {
-
     // 主体
     .main {
         width: 1200px !important;
@@ -192,7 +178,6 @@ onMounted(() => {
 
 // 1300px
 @media screen and (max-width: 1300px) {
-
     // 主体
     .main {
         width: 1050px !important;
@@ -201,13 +186,11 @@ onMounted(() => {
 
 // 1100px
 @media screen and (max-width: 1100px) {
-
     // 主体
     .main {
         display: block !important;
         width: 900px !important;
     }
-
     // 发布博文
     .main_bg {
         display: none !important;
@@ -220,7 +203,6 @@ onMounted(() => {
 
 // 996px
 @media screen and (max-width: 996px) {
-
     // 主体
     .main {
         width: 700px !important;

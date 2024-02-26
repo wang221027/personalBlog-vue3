@@ -36,7 +36,6 @@ let submit = async () => {
     <div>
         <!-- 返回上一级 -->
         <GoBack color="#000" content="编辑资料" width="1200px" />
-        <div class="main_bg"></div>
         <div class="main">
             <el-radio-group v-model="labelPosition" size="small">
                 <el-radio-button label="left">左对齐</el-radio-button>
@@ -59,7 +58,7 @@ let submit = async () => {
 
 <style lang='less' scoped>
 .main {
-    width: 1200px;
+    width: 80%;
     margin: 0 auto;
     background-color: #ccc;
     padding: 20px;
@@ -67,15 +66,4 @@ let submit = async () => {
     opacity: .8;
 }
 
-.main_bg {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: url(./images/bg.jpg) no-repeat;
-    background-size: cover;
-    opacity: .8;
-    z-index: -1;
-}
 </style>
