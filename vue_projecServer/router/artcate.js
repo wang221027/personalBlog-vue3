@@ -41,4 +41,6 @@ router.get('/userInfo', artCate_handler.userInfo);
 router.get('/userInfo2', artCate_handler.userInfo2);
 // 获取用户头像url
 router.get('/userInfo3', artCate_handler.userInfo3);
+// 发表评论
+router.post('addComment', artCate_handler.addComment)
 module.exports = router

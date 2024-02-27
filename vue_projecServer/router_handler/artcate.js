@@ -202,3 +202,27 @@ exports.userInfo3 = (req, res) => {
     });
   });
 };
+
+// 发表评论
+exports.addComment = (req, res) => {
+  const date = new Date();
+  const formattedDate = `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)} ${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${('0' + date.getSeconds()).slice(-2)}`;
+  const strForm = JSON.stringify(formattedDate)
+  const data = {
+    alias: req.body.alias,
+    time: strForm,
+  }
+  // 定义插入文章分类的 SQL 语句
+  const sql = `insert into user_comment set ?`
+  // 执行插入文章分类的 SQL 语句
+  // db.query(sql, data, (err, results) => {
+  //   if (err) {
+  //     return res.cc(err)
+  //   }
+  //   if (results.affectedRows !== 1) return res.cc('新增文章分类失败！')
+  //   res.send({
+  //     message: '新增文章成功！',
+  //     status: 0
+  //   })
+  // })
+}

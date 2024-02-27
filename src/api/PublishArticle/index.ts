@@ -14,7 +14,8 @@ enum API {
     // 根据id修改封面url
     PUT_ID_ARTICLE_COVER = '/my/article/avatar1',
     // 如果没有选封面，根据id添加一张空路径
-    PUT_ID_ARTICLE_COVER_NO = '/api/updateAvatar'
+    PUT_ID_ARTICLE_COVER_NO = '/api/updateAvatar',
+    
 }
 // 发布文章请求地址
 export const reqPublishArticle = (name: string, alias: string, type: any, nickname: string) => {
