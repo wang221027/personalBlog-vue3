@@ -3,8 +3,8 @@
         <div class="content">
             <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2023036449号-2</a>
             <div class="text">
-                当前是一名应届生 <br>
-                Follow Me
+                目前是一名应届生 <br>
+                contact Me
                 <img src="./images/my_weixin.jpg" alt="">
                 欢迎关注我的微信
             </div>

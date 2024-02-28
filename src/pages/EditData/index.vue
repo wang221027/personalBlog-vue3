@@ -60,7 +60,6 @@ let submit = async () => {
 .main {
     width: 80%;
     margin: 0 auto;
-    background-color: #ccc;
     padding: 20px;
     border-radius: 12px;
     opacity: .8;

@@ -204,7 +204,7 @@ onMounted(() => {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: #C7C7C7;
+    background-color: 	#ccc;
     z-index: -1;
 }
 
@@ -213,7 +213,6 @@ onMounted(() => {
     padding: 20px;
     margin: 20px auto;
     border-radius: 10px;
-    background: url(./images/feng_bg.webp) no-repeat;
     background-size: cover;
     .file_container {
         display: flex;

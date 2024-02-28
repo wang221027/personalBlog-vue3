@@ -138,9 +138,9 @@ onMounted(() => {
                         </div>
                     </div>
                     <ul class="random_list">
-                        <li v-for="(item, index) in randomArticles" @click="goArticleCover(item.id)">
+                        <li v-for="(item, index) in randomArticles">
                             <span :style="{backgroundColor:index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc'}">{{ index + 1 }}</span>
-                            <a href="javascript:;">{{ item.name }}</a>
+                            <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
                         </li>
                     </ul>
                 </div>
@@ -271,13 +271,16 @@ main {
                         text-align: center;
                         margin-right: 8px;
                         color: #fff;
+                        border-radius: 4px;
                     }
-                   
                     a {
                         display: inline-block;
                         height: 30px;
                         line-height: 30px;
                         color: #000;
+                    }
+                    a:hover {
+                        color: red;
                     }
                 }
             }

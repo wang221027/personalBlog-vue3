@@ -3,7 +3,6 @@
         <el-page-header @back="goBack" :content="props.content" :style="{ color: props.color }"></el-page-header>
     </div>
 </template>
-
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 const props = defineProps({ color: String, content: String, width: String });
