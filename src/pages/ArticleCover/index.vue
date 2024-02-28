@@ -122,9 +122,6 @@ const addFormElement = (e: any) => {
             avatarUrl2.value = defaultAvatar
         }
         const results = await reqComment(commentText?.value, '1', avatarUrl2.value, userNickName2.value, articleCoverId.value,e.target.dataset.id)
-        console.log(results);
-        console.log(e.target.dataset.id);
-        
         if (results.status == 0) {
             ElMessage({
                 message: '发表成功！',
@@ -165,7 +162,7 @@ onMounted(() => {
         <div class="main">
             <!-- 左边内容 -->
             <div class="main_left">
-                <div style="background-color: goldenrod;width: 100%;padding: 20px;display:flex;box-sizing: border-box;">
+                <div style="background-color: #FFAEB9;width: 100%;padding: 20px;display:flex;box-sizing: border-box;">
                     <!-- 用户头像 -->
                     <div style="width: 80px;height: 80px;">
                         <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
@@ -251,7 +248,6 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -340,7 +336,7 @@ onMounted(() => {
                 display: block;
                 width: 100%;
                 height: 1px;
-                background-color: #fff;
+                background-color: #ccc;
                 margin: 10px auto;
             }
 

@@ -32,6 +32,8 @@ const getArticle = async () => {
     });
     total.value = articleData.value.length;
     isInit.value = true;
+    // 每次刷新都随机展示数据
+    randomDisplay()
 }
 // 获取文章列表封面url
 const getArticleCover = async () => {
@@ -71,12 +73,27 @@ let paginationList = computed(() => {
     }
     return list;
 })
+const randomArticles: any = ref([]);
+const randomDisplay = () => {
+    const randomIndexes: any = [];
+    const articles = articleData.value;
+    while (randomIndexes.length < articles.length) {
+        const randomIndex = Math.floor(Math.random() * articles.length);
+        if (!randomIndexes.includes(randomIndex)) {
+            randomIndexes.push(randomIndex);
+        }
+    }
+    randomIndexes.slice(0, 10).forEach((index: any) => {
+        randomArticles.value.push(articles[index]);
+    });
+}
 // 在页面渲染完成后获取数据
 onMounted(() => {
     // 获取文章数据
     getArticle();
     // 获取文章列表封面url
     getArticleCover();
+
 });
 </script>
 <template>
@@ -114,7 +131,18 @@ onMounted(() => {
                 </div>
                 <!-- 右边装饰 -->
                 <div class="main_right">
-                    哈哈哈
+                    <div>
+                        <div class="title" style="border-bottom: 1px solid #ccc;margin-bottom: 10px;">
+                            <span
+                                style="font-size: 24px;border-bottom: 2px solid #0d6cbf;padding-bottom: 10px;display: inline-block">随机推荐</span>
+                        </div>
+                    </div>
+                    <ul class="random_list">
+                        <li v-for="(item, index) in randomArticles" @click="goArticleCover(item.id)">
+                            <span :style="{backgroundColor:index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc'}">{{ index + 1 }}</span>
+                            <a href="javascript:;">{{ item.name }}</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <!-- 分页器 -->
@@ -147,24 +175,25 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
 }
+
 // 主体
 main {
     width: 100%;
-    background-color: #ccc;
+    background-color: #fff;
     padding-top: 10px;
 }
+
 .main {
     width: 1400px;
-    margin: 10px auto;
-    opacity: .9;
+    margin: 0 auto;
 
     .flex {
         .flex();
+
         // 左边文章
         .main_left {
             flex: 0.65;
-            background-color: #fff;
-            padding: 10px 20px;
+            padding: 0 20px;
 
             // 文章列表
             .list {
@@ -173,8 +202,7 @@ main {
                         .flex();
                         align-items: center;
                         height: 140px;
-                        margin: 20px 0;
-                        background-color: #f1f1f1;
+                        border-bottom: 1px solid #f0f0f2;
                         padding: 10px;
 
                         // 封面
@@ -183,6 +211,7 @@ main {
                             height: 100px;
                             overflow: hidden;
                             flex: 0.3;
+                            border: 1px solid #f0f0f2;
                         }
 
                         // 文章详情
@@ -218,6 +247,10 @@ main {
                             }
                         }
                     }
+
+                    .list_flex:hover {
+                        background-color: #fafafa;
+                    }
                 }
             }
         }
@@ -225,6 +258,29 @@ main {
         // 右边装饰
         .main_right {
             flex: 0.3;
+
+            // 随机展示文章列表
+            .random_list {
+                li {
+                    margin-bottom: 4px;
+                    span {
+                        display: inline-block;
+                        width: 20px;
+                        height: 20px;
+                        line-height: 20px;
+                        text-align: center;
+                        margin-right: 8px;
+                        color: #fff;
+                    }
+                   
+                    a {
+                        display: inline-block;
+                        height: 30px;
+                        line-height: 30px;
+                        color: #000;
+                    }
+                }
+            }
         }
     }
 
@@ -240,29 +296,28 @@ main {
             li {
                 a {
                     display: block;
-                    width: 50px;
-                    height: 50px;
-                    line-height: 50px;
-                    color: yellow;
+                    width: 40px;
+                    height: 40px;
+                    line-height: 40px;
+                    color: #000;
                     text-align: center;
                     text-decoration: none;
-                    font-size: 14px;
+                    font-size: 11px;
                     transition: all 0.3s;
                     margin: 0 4px;
-                    font-weight: bold;
                     border-radius: 2px;
                     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+                    font-weight: bold;
                 }
 
                 .active_bgColor {
-                    background-color: #67c23a;
+                    background-color: #ccc;
+                    color: red;
                 }
             }
         }
     }
 }
-
-
 
 // 响应式 1500px
 @media screen and (max-width: 1500px) {
@@ -463,4 +518,5 @@ main {
     .pagination {
         width: 350px !important;
     }
-}</style>
+}
+</style>
