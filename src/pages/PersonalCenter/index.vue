@@ -271,7 +271,9 @@ main {
     padding-top: 20px;
     background-color: #ccc;
 }
-
+.ui_flex {
+    height: 300px;
+}
 // 主体内容
 .main {
     width: 1400px;
@@ -283,8 +285,6 @@ main {
     //左边内容
     .personal {
         flex: 0.38;
-        height: 400px;
-        background-color: #fff;
         // 日历
         .is-selected {
             color: #1989fa;
