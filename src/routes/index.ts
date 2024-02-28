@@ -61,13 +61,6 @@ export default createRouter({
             component: () => import('@/pages/ChatRoom/index.vue'),
             meta: { title: '聊天室' },
         }, 
-        // 联机游戏
-        {
-            name: 'onlineGame',
-            path: '/onlineGame',
-            component: () => import('@/pages/onlineGame/index.vue'),
-            meta: { title: '联机游戏' },
-        },
          // 留言板
          {
             name: 'MessageBoard',
