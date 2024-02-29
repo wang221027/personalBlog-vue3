@@ -4,7 +4,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineEmits } from 'vue';
 const props = defineProps({ color: String, content: String, width: String });
 const emit = defineEmits(['back']);
 const goBack = () => { window.history.go(-1); }

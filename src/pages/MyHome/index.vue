@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, reactive } from "vue"
 // 引入api
 import { reqArticle, reqArticleCoverData } from '@/api/home'
 // 引入类型
@@ -23,6 +23,11 @@ let currentPage = ref(1)
 let pageSize = ref(10)
 // 计算是否显示后的总数量
 let totalSplice = ref(0)
+// 轮播图url
+const bannerUrl = reactive([
+    'http://43.138.70.109:8010/head/zhi.webp',
+    'http://43.138.70.109:8010/head/web.webp'
+])
 // 获取文章数据
 const getArticle = async () => {
     const result: isArticleData = await reqArticle();
@@ -98,6 +103,22 @@ onMounted(() => {
 });
 </script>
 <template>
+    <header>
+        <section class="header_banner">
+            <el-carousel :interval="5000" arrow="always">
+                <el-carousel-item v-for="item in bannerUrl">
+                    <img :src="item" alt="">
+                </el-carousel-item>
+            </el-carousel>
+        </section>
+        <section class="header_content">
+            <img src="http://43.138.70.109:8010/head/hei.jpg" alt="">
+            <p>
+                有需要<span style="color: #ceefea;">(前端/移动开发)</span><br>的朋友可以联系我 <br>
+                微信在底部
+            </p>
+        </section>
+    </header>
     <!-- 主体 -->
     <main>
         <div class="main">
@@ -169,7 +190,6 @@ onMounted(() => {
             </div>
         </div>
     </main>
-
     <Bottom class="bottom" />
 </template>
 <style lang='less' scoped>
@@ -177,6 +197,59 @@ onMounted(() => {
 .flex {
     display: flex;
     justify-content: space-between;
+}
+
+// 头部
+header {
+    width: 1100px;
+    display: flex;
+    justify-content: space-between;
+    margin: 40px auto;
+
+    // 轮播图
+    .header_banner {
+        flex: .5;
+
+        .el-carousel__item h3 {
+            color: #475669;
+            opacity: 0.75;
+            line-height: 300px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .el-carousel__item:nth-child(2n) {
+            background-color: #99a9bf;
+        }
+
+        .el-carousel__item:nth-child(2n + 1) {
+            background-color: #d3dce6;
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: 300px;
+        }
+    }
+
+    .header_content {
+        flex: .4;
+        position: relative;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        p {
+            transform: translate(180px, 120px);
+            color: #f7b0b0;
+            font-size: 14px;
+        }
+    }
 }
 
 // 主体
@@ -271,6 +344,7 @@ main {
                     text-overflow: ellipsis;
                     /* 使用省略号表示被隐藏的文本内容 */
                     white-space: nowrap;
+
                     /* 防止文本换行 */
                     span {
                         display: inline-block;
@@ -372,6 +446,23 @@ main {
     /deep/ .el-carousel .el-carousel__button {
         width: 20px;
     }
+
+    // 右侧装饰
+    .main_right {
+        width: 300px;
+    }
+
+    // 头部
+    header {
+        width: 800px;
+    }
+
+    /deep/ .el-carousel__container {
+        height: 250px;
+    }
+    header img {
+        height: 250px;
+    }
 }
 
 // 1100px
@@ -381,6 +472,26 @@ main {
     .main,
     .demo-tabs {
         width: 800px;
+    }
+
+    // 右侧装饰
+    .main_right {
+        width: 260px;
+    }
+    // 头部
+    header {
+        width: 700px;
+    }
+
+    /deep/ .el-carousel__container {
+        height: 200px;
+    }
+    header img {
+        height: 200px;
+    }
+    // 顶部右侧文字
+    header .header_content p {
+        transform: translate(105px, 89px);
     }
 }
 
@@ -430,6 +541,7 @@ main {
 
     // 左边内容
     .main_left {
+        width: 300px;
         flex: 1 !important;
     }
 
@@ -472,6 +584,10 @@ main {
     .page_bottom,
     .page_top {
         display: none !important;
+    }
+    // 头部
+    header {
+        display: none;
     }
 }
 
@@ -533,5 +649,4 @@ main {
     .pagination {
         width: 350px !important;
     }
-}
-</style>
+}</style>
