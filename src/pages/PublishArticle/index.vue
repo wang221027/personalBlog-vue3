@@ -207,7 +207,6 @@ onMounted(() => {
     background-color: 	#ccc;
     z-index: -1;
 }
-
 .main {
     width: 1200px;
     padding: 20px;
@@ -265,6 +264,9 @@ onMounted(() => {
     // 文章内容
     /deep/ .el-form-item__label {
         color: #fff;
+    }
+    /deep/ .el-textarea__inner {
+        height: 200px;
     }
 }
 // 1300px

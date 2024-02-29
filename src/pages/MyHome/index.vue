@@ -73,6 +73,7 @@ let paginationList = computed(() => {
     }
     return list;
 })
+// 随机展示10条文章列表
 const randomArticles: any = ref([]);
 const randomDisplay = () => {
     const randomIndexes: any = [];

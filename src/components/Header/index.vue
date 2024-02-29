@@ -122,7 +122,7 @@ let quit = () => {
     })
     $bus.emit("getUserId")
     setTimeout(() => {
-        $router.push({ name: 'HomePage' })
+        $router.push({ name: 'home' })
     }, 1000)
 }
 // 更换头像

@@ -45,7 +45,7 @@ export const reqUserMessageHead = (id:string) => {
     })
 }
 // 发表评论
-export const reqComment = (alias: string, isReply: string, avatarUrl: string, nickname: string, commentId: string, userCommentId: any) => {
+export const reqComment = (alias: string, isReply: string, avatarUrl: string, nickname: string, commentId: string, userCommentId: any,otherUserNames?: string) => {
     return request({
         url: API.PUT_COMMENT,
         method: 'post',
@@ -55,7 +55,8 @@ export const reqComment = (alias: string, isReply: string, avatarUrl: string, ni
             avatarUrl,
             nickname,
             commentId,
-            userCommentId
+            userCommentId,
+            otherUserNames
         })
     })
 }

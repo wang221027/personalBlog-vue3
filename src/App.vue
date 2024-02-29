@@ -1,15 +1,10 @@
 <script setup lang='ts'>
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 // 引入路由构造器
-import { useRouter, useRoute } from 'vue-router'
-const $router = useRouter();
+import { useRoute } from 'vue-router'
 const $route = useRoute()
-
 // 引入全局事件总线
 import $bus from './utils/event-bus'
-onMounted(() => {
-  $router.push({ name: 'home' })
-})
 // 监视路由跳转，如果从其他路由跳转到home，通知tabBar组件把高亮调为第一个
 watch($route, () => {
   if ($route.path == '/home') {

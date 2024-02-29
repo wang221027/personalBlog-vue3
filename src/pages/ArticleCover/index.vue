@@ -55,8 +55,17 @@ let goIssue = () => {
 let formLabelAlign: any = reactive({
     alias: "",
 })
+// 存储用户的token
+const token = localStorage.getItem("token") || ''
 // 发表评论 
 let publish = async () => {
+    if(token == '') {
+        return ElMessage({
+            message: '登录后解释评论功能！',
+            type: 'error',
+            offset: 180
+        })
+    }
     if (formLabelAlign.alias == '') {
         return ElMessage({
             message: '内容不允许为空',
@@ -68,7 +77,6 @@ let publish = async () => {
         avatarUrl2.value = defaultAvatar;
     }
     const results = await reqComment(formLabelAlign.alias, '0', avatarUrl2.value, userNickName2.value, articleCoverId.value,'')
-    console.log(results);
     if (results.status == 0) {
         ElMessage({
             message: '发表成功！',
@@ -91,6 +99,15 @@ let getComments = async () => {
 let isCreate = ref(true)
 // 回复评论
 const addFormElement = (e: any) => {
+    console.log(e.target);
+    
+    if(token == '') {
+        return ElMessage({
+            message: '登录后解释评论功能！',
+            type: 'error',
+            offset: 180
+        })
+    }
     if (isCreate.value) {
         const html = `
             <div>
@@ -121,7 +138,7 @@ const addFormElement = (e: any) => {
         if (avatarUrl2.value == 'undefined') {
             avatarUrl2.value = defaultAvatar
         }
-        const results = await reqComment(commentText?.value, '1', avatarUrl2.value, userNickName2.value, articleCoverId.value,e.target.dataset.id)
+        const results = await reqComment(commentText?.value, '1', avatarUrl2.value, userNickName2.value, articleCoverId.value,e.target.dataset.id, e.target.dataset.nickname)
         if (results.status == 0) {
             ElMessage({
                 message: '发表成功！',
@@ -233,7 +250,7 @@ onMounted(() => {
                                             <el-avatar :src="item2.avatarUrl" />
                                         </div>
                                         <div style="margin-left: 10px;font-size: 14px;">
-                                            <span style="color: green;">{{ item2.nickname }}</span>回复<span style="color: salmon;">{{ item.nickname }}</span>
+                                            <span style="color: green;">{{ item2.nickname }}</span>回复<span style="color: salmon;">{{ item2.otherUserNames == null ? item.nickname : item2.otherUserNames }}</span>
                                         </div>
                                         <div style="font-size: 12px;color: #111;margin-left: 10px;margin-top: 4px;">
                                             {{ item2.time }}
@@ -243,7 +260,7 @@ onMounted(() => {
                                         {{ item2.alias }}
                                     </div>
                                     <div @click="addFormElement" class="reply" :data-id="item.id" v-if="item2.nickname != userNickName2"
-                                    :data-nickname="item.nickname">回复</div>
+                                    :data-nickname="item2.nickname">回复</div>
                                 </div>
                             </div>
                         </div>
