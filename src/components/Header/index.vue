@@ -159,14 +159,6 @@ let getUserList = async () => {
     userListData.value = results.data;
     links.value = loadAll()
 }
-// 社区
-let community = () => {
-    ElMessage({
-        message: '社区功能还未上线，敬请期待！',
-        type: 'warning',
-        offset: 180
-    })
-}
 onMounted(() => {
     // 获取文章列表
     getUserList()
@@ -214,7 +206,7 @@ onBeforeUnmount(() => {
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
                     <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
-                    <li><el-link type="success" @click="community">社区</el-link></li>
+                    <li><router-link to="/Community"><el-link type="success">社区</el-link></router-link></li>
                     <li>
                         <a href="https://github.com/wang221027/vue3-ts-vite.git" target="_blank">
                             <el-link type="success">GitHub<el-icon>

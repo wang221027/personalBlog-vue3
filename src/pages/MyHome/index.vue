@@ -139,7 +139,9 @@ onMounted(() => {
                     </div>
                     <ul class="random_list">
                         <li v-for="(item, index) in randomArticles">
-                            <span :style="{backgroundColor:index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc'}">{{ index + 1 }}</span>
+                            <span
+                                :style="{ backgroundColor: index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc' }">{{
+                                    index + 1 }}</span>
                             <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
                         </li>
                     </ul>
@@ -263,6 +265,12 @@ main {
             .random_list {
                 li {
                     margin-bottom: 4px;
+                    overflow: hidden;
+                    /* 隐藏超出部分的文本内容 */
+                    text-overflow: ellipsis;
+                    /* 使用省略号表示被隐藏的文本内容 */
+                    white-space: nowrap;
+                    /* 防止文本换行 */
                     span {
                         display: inline-block;
                         width: 20px;
@@ -273,12 +281,15 @@ main {
                         color: #fff;
                         border-radius: 4px;
                     }
+
                     a {
                         display: inline-block;
                         height: 30px;
                         line-height: 30px;
                         color: #000;
+
                     }
+
                     a:hover {
                         color: red;
                     }
