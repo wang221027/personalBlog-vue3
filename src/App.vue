@@ -1,29 +1,27 @@
 <script setup lang='ts'>
-import { watch } from 'vue'
+import { watch } from 'vue';
 // 引入路由构造器
-import { useRoute } from 'vue-router'
-const $route = useRoute()
+import { useRoute } from 'vue-router';
+const $route = useRoute();
 // 引入全局事件总线
-import $bus from './utils/event-bus'
+import $bus from './utils/event-bus';
 // 监视路由跳转，如果从其他路由跳转到home，通知tabBar组件把高亮调为第一个
 watch($route, () => {
   if ($route.path == '/home') {
-    $bus.emit("isCountOne")
+    $bus.emit("isCountOne");
   }
 })
+
+
 </script>
 <template>
   <Header />
   <router-view></router-view>
   <footerTab />
 </template>
-
 <style lang='less'>
-
-
 // 768px
 @media screen and (max-width: 768px) {
-
   // 导航栏
   .nav {
     width: 600px !important;

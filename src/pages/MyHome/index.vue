@@ -6,6 +6,8 @@ import { reqArticle, reqArticleCoverData } from '@/api/home'
 import { isArticleData } from '@/api/home/type'
 // 引入router构造器
 import { useRouter } from 'vue-router'
+// 引入字体图标样式
+import '@/pages/MyHome/font/iconfont.css'
 const $router = useRouter();
 // 文章列表数据
 let articleData: any = ref([])
@@ -38,7 +40,8 @@ const getArticle = async () => {
     total.value = articleData.value.length;
     isInit.value = true;
     // 每次刷新都随机展示数据
-    randomDisplay()
+    randomDisplay(randomArticles.value)
+    randomDisplay(reqArticles.value)
 }
 // 获取文章列表封面url
 const getArticleCover = async () => {
@@ -80,7 +83,8 @@ let paginationList = computed(() => {
 })
 // 随机展示10条文章列表
 const randomArticles: any = ref([]);
-const randomDisplay = () => {
+const reqArticles: any = ref([])
+const randomDisplay = (data: any) => {
     const randomIndexes: any = [];
     const articles = articleData.value;
     while (randomIndexes.length < articles.length) {
@@ -90,16 +94,16 @@ const randomDisplay = () => {
         }
     }
     randomIndexes.slice(0, 10).forEach((index: any) => {
-        randomArticles.value.push(articles[index]);
+        data.push(articles[index]);
     });
 }
+
 // 在页面渲染完成后获取数据
 onMounted(() => {
     // 获取文章数据
     getArticle();
     // 获取文章列表封面url
     getArticleCover();
-
 });
 </script>
 <template>
@@ -125,6 +129,12 @@ onMounted(() => {
             <div class="flex">
                 <!-- 左边文章 -->
                 <div class="main_left">
+                    <div style="border-bottom: 1px solid #ccc;margin: 10px 0;">
+                        <span
+                            style="font-size: 24px;border-bottom: 2px solid #0d6cbf;padding-bottom: 10px;display: inline-block">
+                            最新文章
+                        </span>
+                    </div>
                     <!-- 文章列表 -->
                     <ul class="list">
                         <li v-for="(item) in showDataList" :key="item.id">
@@ -137,15 +147,21 @@ onMounted(() => {
                                     backgroundRepeat: 'no-repeat'
                                 }" v-if="isArticleCover && articleCover[item.id - 1].file == 'show'"></div>
                                 <!-- 文章详情 -->
-                                <div class="list_right" v-if="isArticleCover" @click="goArticleCover(item.id)"
+                                <div class="list_right" v-if="isArticleCover"
                                     :style="{ flex: articleCover[item.id - 1].file == 'show' ? '0.65' : '1' }">
-                                    <el-link type="info" class="list_right_title">{{ item.name }}</el-link>
-                                    <p class="article">{{ item.alias }}</p>
+                                    <el-link type="info" class="list_right_title" @click="goArticleCover(item.id)">{{
+                                        item.name }}</el-link>
+                                    <p class="article" style="cursor: pointer;" @click="goArticleCover(item.id)">{{
+                                        item.alias }}</p>
                                     <div>
                                         <p>类型：{{ item.type }}</p>
                                         <p>发布日期：{{ item.time }}</p>
                                     </div>
-                                    <p>作者：{{ item.nickname }}</p>
+                                    <div style="display: flex;justify-content: space-between;">
+
+
+                                        <p>作者：{{ item.nickname }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -167,6 +183,21 @@ onMounted(() => {
                             <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
                         </li>
                     </ul>
+                    <div>
+                        <div class="title" style="border-bottom: 1px solid #ccc;margin: 10px 0;">
+                            <span
+                                style="font-size: 24px;border-bottom: 2px solid #0d6cbf;padding-bottom: 10px;display: inline-block">热门推荐</span>
+                        </div>
+                        <!-- 热门推荐 -->
+                        <ul class="random_list">
+                            <li v-for="(item, index) in reqArticles">
+                                <span
+                                    :style="{ backgroundColor: index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc' }">{{
+                                        index + 1 }}</span>
+                                <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <!-- 分页器 -->
@@ -460,6 +491,7 @@ main {
     /deep/ .el-carousel__container {
         height: 250px;
     }
+
     header img {
         height: 250px;
     }
@@ -478,6 +510,7 @@ main {
     .main_right {
         width: 260px;
     }
+
     // 头部
     header {
         width: 700px;
@@ -486,9 +519,11 @@ main {
     /deep/ .el-carousel__container {
         height: 200px;
     }
+
     header img {
         height: 200px;
     }
+
     // 顶部右侧文字
     header .header_content p {
         transform: translate(105px, 89px);
@@ -585,6 +620,7 @@ main {
     .page_top {
         display: none !important;
     }
+
     // 头部
     header {
         display: none;
@@ -649,4 +685,5 @@ main {
     .pagination {
         width: 350px !important;
     }
-}</style>
+}
+</style>
