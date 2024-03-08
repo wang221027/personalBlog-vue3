@@ -54,10 +54,6 @@ function connectSocket(data: any) {
     });
     // 向服务器提交用户信息
     socket.emit("login", data)
-    // 接收服务器返回的用户信息
-    // socket.on("reqUserDataList", (data: any) => {
-
-    // })
     // 让信息出现在可视区
     socket.on("reqData", (data: any) => {
         socketStore.chatMessageList = data;
@@ -80,15 +76,10 @@ let returnTop = () => {
                 lastElement = item;
             }
         });
-        const chatContainer = document.querySelector("#messages");
+        // const chatContainer = document.querySelector("#messages");
         if (lastElement) {
             lastElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        } else {
-            const bottomElement = chatContainer!.lastElementChild;
-            if (bottomElement) {
-                bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        }
+        } 
     });
 }
 let returnUserTop = () => {
@@ -96,19 +87,15 @@ let returnUserTop = () => {
         const filterElement = document.querySelectorAll("#messages li");
         let lastElement: any = null;
         filterElement.forEach((item: any) => {
-            if (item.dataset.message == socketStore.chatType) {
+            if ((item.dataset.message2 == socketStore.chatType && item.dataset.message == nickname.value) 
+            || item.dataset.message == socketStore.chatType && item.dataset.message2 == nickname.value) {
                 lastElement = item;
             }
         });
-        const chatContainer = document.querySelector("#messages");
+        // const chatContainer = document.querySelector("#messages");
         if (lastElement) {
             lastElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        } else {
-            const bottomElement = chatContainer!.lastElementChild;
-            if (bottomElement) {
-                bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        }
+        } 
     });
 }
 // 发送信息
@@ -174,12 +161,12 @@ let computedMessage = computed(() => {
 })
 let isUserMessage = ref(false)
 let computedUserMessage = computed(() => (name: any) => {
-    let arr = computedMessage.value.filter((element: any) => element.infoType === name && element.userName === nickname.value);
+    let arr = computedMessage.value.filter((element: any) => (element.infoType === name && element.userName === nickname.value) || (element.infoType === nickname.value && element.userName === name));
     if (arr.length > 0) {
         return arr[arr.length - 1].content;
     } else {
         // 处理数组为空的情况，例如返回一个默认值或者抛出错误
-        return 'No content found';
+        return '你和该好友还没有聊天~';
     }
 });
 // 检测用户头像是否更新
@@ -264,7 +251,8 @@ onMounted(() => {
                         v-for="item in socketStore.chatMessageList" v-show="((item.infoType == socketStore.chatType && item.userName == nickname && item.infoType != '默认群聊') ||
                             item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) ||
                             (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)"
-                        :data-message="item.infoType">
+                        :data-message="item.infoType"
+                        :data-message2="item.userName">
                         <img :src="item.avatar" style="width: 40px;height: 40px;"
                             v-show="item.type == 'user' || item.nickname != nickname"
                             :style="{ float: item.nickname == nickname ? 'right' : 'left' }">
