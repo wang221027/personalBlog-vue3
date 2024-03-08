@@ -46,8 +46,10 @@ const getArticle = async () => {
 // 获取文章列表封面url
 const getArticleCover = async () => {
     const result: any = await reqArticleCoverData();
-    articleCover = result.data
-    isArticleCover.value = true;
+    if (result.length > 0) {
+        articleCover = result.data
+        isArticleCover.value = true;
+    }
 }
 // 点击标题跳转到对应的文章详情
 let goArticleCover = (id: number) => {
@@ -154,12 +156,10 @@ onMounted(() => {
                                     <p class="article" style="cursor: pointer;" @click="goArticleCover(item.id)">{{
                                         item.alias }}</p>
                                     <div>
-                                        <p>类型：{{ item.type }}</p>
+                                        <p style="max-width: 72%;">类型：{{ item.type }}</p>
                                         <p>发布日期：{{ item.time }}</p>
                                     </div>
                                     <div style="display: flex;justify-content: space-between;">
-
-
                                         <p>作者：{{ item.nickname }}</p>
                                     </div>
                                 </div>

@@ -9,12 +9,26 @@ const socketStore = userSocket();
 // 引入 api 接口
 import { reqUsreInfo, reqUserData } from '@/api/socket/index'
 // 引入字体图标样式
-import './font/iconfont.css'
+import './font/xiaolian/iconfont.css'
 // 引入类型
 // import { tokenData } from '@/api/socket/type'
 let nickname: any = ref('')
 // 存储用户头像
 let avatar = ref('')
+// 存储用户发送的信息
+let userInfo = ref('')
+// 表情是否显示
+let isEmojiBlock = ref(false)
+// 表情
+import data from "emoji-mart-vue-fast/data/all.json";
+// Import default CSS
+import "emoji-mart-vue-fast/css/emoji-mart.css";
+// @ts-ignore
+import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
+const emojiIndex = new EmojiIndex(data)
+const showEmoji = (emoji: any) => {
+    userInfo.value = userInfo.value + emoji.native;
+}
 // 好友列表滚动触底事件
 const load = () => {
 
@@ -32,8 +46,11 @@ let getUserToken = async () => {
 }
 let socket: any;
 function connectSocket(data: any) {
+    console.log(data);
     // 使用用户信息建立Socket连接
-    socket = io("http://wyuanlin.site:8010");
+    socket = io("http://wyuanlin.site:8010", {
+        query: data
+    });
     // 向服务器提交用户信息
     socket.emit("login", data)
     // 接收服务器返回的用户信息
@@ -57,12 +74,8 @@ function connectSocket(data: any) {
         // 获取用户信息
         getUserData();
     })
-    socket.on("reqUserInfo", (data: any) => {
-        socket.emit("addUserInfo", data)
-    })
 }
-// 存储用户发送的信息
-let userInfo = ref('')
+
 // 发送信息
 let sendInfo = () => {
     if (userInfo.value.trim() == '') {
@@ -116,26 +129,31 @@ let defaultMessage = () => {
 }
 onMounted(() => {
     getUserToken();
-    avatar.value = localStorage.getItem("avatarUrl") || 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png';
+    avatar.value = localStorage.getItem("avatarUrl") as string;
     nickname.value = localStorage.getItem("nickname");
     // 获取用户聊天记录
     getUserInfo();
     // 获取用户信息
     getUserData();
     socketStore.chatType = '默认群聊'
-})
+    document.querySelectorAll(".emoji-mart-emoji").forEach((element: any) => {
+        element.addEventListener('click', () => {
+            isEmojiBlock.value = false;
+        })
+    })
+});
 </script>
 <template>
     <div class="container">
         <!-- 侧边栏 -->
-        <div class="container_left">
+        <div class="container_left" @click="isEmojiBlock = false">
 
         </div>
         <!-- 聊天好友 -->
-        <div class="container_tabbar">
+        <div class="container_tabbar" @click="isEmojiBlock = false">
             <el-input v-model="input" style="width: 100%;" placeholder="搜索" />
             <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto;height: calc(100vh - 112px)">
-                <li class="infinite-list-item" @click="defaultMessage">
+                <li class="infinite-list-item" @click="defaultMessage" :class="{ active: socketStore.chatType == '默认群聊' }">
                     <div style="display: flex;align-items: center;">
                         <img src="http://43.138.70.109:8010/avatar/haizeiw.jpg" alt="">
                         <div>
@@ -147,12 +165,13 @@ onMounted(() => {
                         2024/3/3
                     </div>
                 </li>
-                <li v-for="item in socketStore.userList" class="infinite-list-item" @click="tabUser(item.name)"
-                    v-show="item.name != nickname">
+                <li v-for="item in socketStore.userList"
+                    :class="['infinite-list-item', { active: socketStore.chatType == item.name }]"
+                    @click="tabUser(item.name)" v-show="item.name != nickname">
                     <div style="display: flex;align-items: center;">
                         <img :src="item.avatar" alt="">
                         <div>
-                            <span>{{ item.name }}</span>
+                            <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0' && item.name != nickname"></span></span>
                             <p style="font-size: 14px;">今天吃什么呢？</p>
                         </div>
                     </div>
@@ -163,18 +182,17 @@ onMounted(() => {
             </ul>
         </div>
         <!-- 内容 -->
-        <div class="container_right">
-            <div class="container_right_top">
+        <div class="container_right" style="position: relative;">
+            <div class="container_right_top" @click="isEmojiBlock = false">
                 {{ socketStore.chatType }}
             </div>
             <!-- 聊天内容 -->
-            <div class="container_right_content">
+            <div class="container_right_content" @click="isEmojiBlock = false">
                 <ul id="messages">
                     <li :style="{ textAlign: item.nickname == nickname && item.type == 'my' ? 'right' : 'left' }"
-                        v-for="item in socketStore.chatMessageList"
-                        v-show="((item.infoType == socketStore.chatType && item.userName == nickname && item.infoType != '默认群聊') || 
-                        item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) || 
-                        (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)">
+                        v-for="item in socketStore.chatMessageList" v-show="((item.infoType == socketStore.chatType && item.userName == nickname && item.infoType != '默认群聊') ||
+                            item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) ||
+                            (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)">
                         <img :src="item.avatar" style="width: 40px;height: 40px;"
                             v-show="item.type == 'user' || item.nickname != nickname"
                             :style="{ float: item.nickname == nickname ? 'right' : 'left' }">
@@ -193,10 +211,13 @@ onMounted(() => {
             <div class="container_right_bottom">
                 <!-- 功能分区 -->
                 <div class="sectorization">
-                    <span class="iconfont icon-xiaolian1"></span>
+                    <span class="iconfont icon-xiaolian1" @click="isEmojiBlock = !isEmojiBlock"></span>
+                    <div class="is_hidden" v-show="isEmojiBlock">
+                        <Picker :data="emojiIndex" set="twitter" @select="showEmoji" />
+                    </div>
                 </div>
                 <!-- 发送框 -->
-                <form action="" class="send_container">
+                <form action="" class="send_container" @click="isEmojiBlock = false">
                     <textarea v-model="userInfo" class="textarea__inner" @keydown.enter="sendInfo" id="textarea"
                         @click="textareaFocus"></textarea>
                     <el-button type="primary" @click="sendInfo">发送</el-button>
@@ -225,6 +246,16 @@ onMounted(() => {
 
 * {
     box-sizing: border-box;
+}
+
+.card-header {
+    div {
+        span {
+            display: block;
+            font-size: 12px;
+            color: #b6b6b6;
+        }
+    }
 }
 
 .container {
@@ -257,6 +288,7 @@ onMounted(() => {
             text-overflow: ellipsis;
             /* 使用省略号表示被隐藏的文本内容 */
             white-space: nowrap;
+
             /* 防止文本换行 */
             // 发送时间
             .infinite_time {
@@ -264,9 +296,22 @@ onMounted(() => {
                 color: #999;
                 margin-top: -16px;
             }
+
+            .on_line {
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #17fa0a;
+                margin-left: 4px;
+            }
         }
 
         .infinite-list-item:hover {
+            background-color: #c9c8c6;
+        }
+
+        .infinite-list-item.active {
             background-color: #c9c8c6;
         }
 
@@ -314,6 +359,10 @@ onMounted(() => {
                             font-size: 14px;
                         }
                     }
+
+                    img {
+                        cursor: pointer;
+                    }
                 }
 
                 .row-1 {
@@ -350,6 +399,12 @@ onMounted(() => {
                 span {
                     margin-right: 10px;
                     cursor: pointer;
+                }
+
+                .is_hidden {
+                    position: absolute;
+                    top: 140px;
+                    left: 2px;
                 }
             }
         }

@@ -1,17 +1,34 @@
 <script setup lang='ts'>
-import { watch } from 'vue';
+import { watch, onMounted } from 'vue';
 // 引入路由构造器
 import { useRoute } from 'vue-router';
 const $route = useRoute();
 // 引入全局事件总线
 import $bus from './utils/event-bus';
+// 引入api
+import { isToken } from '@/api/App'
+// 判断用户token是否有效
+let getIsToken = async () => {
+  const username: any = localStorage.getItem("username")
+  if (username) {
+    const results: any = await isToken(username)
+    if(results.length == 0) {
+      localStorage.clear();
+    }
+  }else {
+    localStorage.clear();
+  }
+}
 // 监视路由跳转，如果从其他路由跳转到home，通知tabBar组件把高亮调为第一个
 watch($route, () => {
   if ($route.path == '/home') {
     $bus.emit("isCountOne");
   }
-})
 
+})
+onMounted(() => {
+  getIsToken()
+})
 
 </script>
 <template>
@@ -22,6 +39,7 @@ watch($route, () => {
 <style lang='less'>
 // 768px
 @media screen and (max-width: 768px) {
+
   // 导航栏
   .nav {
     width: 600px !important;
@@ -56,4 +74,5 @@ watch($route, () => {
   .listNone {
     display: none !important;
   }
-}</style>
+}
+</style>
