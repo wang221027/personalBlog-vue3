@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { onMounted, ref, reactive, nextTick } from 'vue'
+import { onMounted, ref, reactive, nextTick, computed } from 'vue'
 import { io } from "socket.io-client";
 // 引入 Element-plus 提示信息
 import { ElMessage } from 'element-plus';
@@ -29,6 +29,8 @@ const emojiIndex = new EmojiIndex(data)
 const showEmoji = (emoji: any) => {
     userInfo.value = userInfo.value + emoji.native;
 }
+// 判断用户聊天记录最后一条是否在好友列表显示
+let isMessage = ref(false)
 // 好友列表滚动触底事件
 const load = () => {
 
@@ -46,7 +48,6 @@ let getUserToken = async () => {
 }
 let socket: any;
 function connectSocket(data: any) {
-    console.log(data);
     // 使用用户信息建立Socket连接
     socket = io("http://wyuanlin.site:8010", {
         query: data
@@ -54,20 +55,14 @@ function connectSocket(data: any) {
     // 向服务器提交用户信息
     socket.emit("login", data)
     // 接收服务器返回的用户信息
-    socket.on("reqUserDataList", (data: any) => {
-        console.log(data);
+    // socket.on("reqUserDataList", (data: any) => {
 
-    })
+    // })
     // 让信息出现在可视区
     socket.on("reqData", (data: any) => {
         socketStore.chatMessageList = data;
-        nextTick(() => {
-            const chatContainer = document.querySelector("#messages")
-            const bottomElement = chatContainer!.lastElementChild; // 获取容器的最后一个子元素
-            if (bottomElement) {
-                bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        })
+        returnTop()
+        returnUserTop()
     })
     // 当有用户连接时更新用户列表
     socket.on("updateUserList", () => {
@@ -75,7 +70,47 @@ function connectSocket(data: any) {
         getUserData();
     })
 }
-
+// 封装群聊信息可视区函数
+let returnTop = () => {
+    nextTick(() => {
+        const filterElement = document.querySelectorAll("#messages li");
+        let lastElement: any = null;
+        filterElement.forEach((item: any) => {
+            if (item.dataset.message === '默认群聊') {
+                lastElement = item;
+            }
+        });
+        const chatContainer = document.querySelector("#messages");
+        if (lastElement) {
+            lastElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else {
+            const bottomElement = chatContainer!.lastElementChild;
+            if (bottomElement) {
+                bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+    });
+}
+let returnUserTop = () => {
+    nextTick(() => {
+        const filterElement = document.querySelectorAll("#messages li");
+        let lastElement: any = null;
+        filterElement.forEach((item: any) => {
+            if (item.dataset.message == socketStore.chatType) {
+                lastElement = item;
+            }
+        });
+        const chatContainer = document.querySelector("#messages");
+        if (lastElement) {
+            lastElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        } else {
+            const bottomElement = chatContainer!.lastElementChild;
+            if (bottomElement) {
+                bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        }
+    });
+}
 // 发送信息
 let sendInfo = () => {
     if (userInfo.value.trim() == '') {
@@ -100,6 +135,8 @@ let sendInfo = () => {
 let getUserInfo = async () => {
     const results: any = await reqUsreInfo()
     socketStore.chatMessageList = results.data;
+    isMessage.value = true;
+    isUserMessage.value = true;
 }
 const input = ref('')
 // 点击后让输入框获取焦点
@@ -110,22 +147,52 @@ let textareaFocus = () => {
 let getUserData = async () => {
     const results: any = await reqUserData();
     socketStore.userList = results;
+    returnTop()
 }
 // 点击好友回调
 let tabUser = (name: string) => {
     socketStore.chatType = name;
-    if (socketStore.chatType != name) {
-        // 获取用户聊天记录
-        getUserInfo();
-    }
+    returnUserTop()
 }
 // 默认群聊
 let defaultMessage = () => {
     socketStore.chatType = "默认群聊";
-    if (socketStore.chatType !== '默认群聊') {
-        // 获取用户聊天记录
-        getUserInfo();
+    returnTop()
+}
+// 过滤出群聊信息
+let componentDefaultMessage = computed(() => {
+    let message: any
+    if (isMessage.value) {
+        message = socketStore.chatMessageList.filter((element: any) => element.is_type == '默认群聊')
     }
+    return message;
+})
+// 过滤出私聊用户信息
+let computedMessage = computed(() => {
+    const message = socketStore.chatMessageList.filter((element: any) => element.is_type != '默认群聊')
+    return message;
+})
+let isUserMessage = ref(false)
+let computedUserMessage = computed(() => (name: any) => {
+    let arr = computedMessage.value.filter((element: any) => element.infoType === name && element.userName === nickname.value);
+    if (arr.length > 0) {
+        return arr[arr.length - 1].content;
+    } else {
+        // 处理数组为空的情况，例如返回一个默认值或者抛出错误
+        return 'No content found';
+    }
+});
+// 检测用户头像是否更新
+let watchAvatar = () => {
+    let userId = localStorage.getItem("userId")
+    let userAvatar = localStorage.getItem("avatarUrl")
+    if(userId) {
+        let filterElement: any = socketStore.userList.filter((element: any) => element.user_id == userId)
+        if(userAvatar != filterElement.avatar) {
+           socket.emit("updateAvatar", userAvatar)
+        }
+    }
+    
 }
 onMounted(() => {
     getUserToken();
@@ -141,6 +208,8 @@ onMounted(() => {
             isEmojiBlock.value = false;
         })
     })
+    // 检测用户头像是否更新
+    watchAvatar()
 });
 </script>
 <template>
@@ -158,7 +227,9 @@ onMounted(() => {
                         <img src="http://43.138.70.109:8010/avatar/haizeiw.jpg" alt="">
                         <div>
                             <span>默认群聊</span>
-                            <p style="font-size: 14px;">哈哈</p>
+                            <p style="font-size: 14px;">{{ isMessage &&
+                                componentDefaultMessage[componentDefaultMessage.length -
+                                    1].content }}</p>
                         </div>
                     </div>
                     <div class="infinite_time">
@@ -171,8 +242,8 @@ onMounted(() => {
                     <div style="display: flex;align-items: center;">
                         <img :src="item.avatar" alt="">
                         <div>
-                            <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0' && item.name != nickname"></span></span>
-                            <p style="font-size: 14px;">今天吃什么呢？</p>
+                            <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span></span>
+                            <p style="font-size: 14px;">{{ isUserMessage && computedUserMessage(item.name) }}</p>
                         </div>
                     </div>
                     <div class="infinite_time">
@@ -192,7 +263,8 @@ onMounted(() => {
                     <li :style="{ textAlign: item.nickname == nickname && item.type == 'my' ? 'right' : 'left' }"
                         v-for="item in socketStore.chatMessageList" v-show="((item.infoType == socketStore.chatType && item.userName == nickname && item.infoType != '默认群聊') ||
                             item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) ||
-                            (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)">
+                            (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)"
+                        :data-message="item.infoType">
                         <img :src="item.avatar" style="width: 40px;height: 40px;"
                             v-show="item.type == 'user' || item.nickname != nickname"
                             :style="{ float: item.nickname == nickname ? 'right' : 'left' }">
