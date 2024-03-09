@@ -60,6 +60,18 @@ export default createRouter({
       path: "/ChatRoom",
       component: () => import("@/pages/ChatRoom/index.vue"),
       meta: { title: "聊天室" },
+      redirect: '/ChatRoom/message',
+      children: [
+        {
+          path: "message",
+          component: () => import("@/pages/ChatRoom/Chat/index.vue"),
+        },
+        // 好友列表
+        {
+          path: "userList",
+          component: () => import("@/pages/ChatRoom/Users/index.vue"),
+        },
+      ],
     },
     // 留言板
     {
