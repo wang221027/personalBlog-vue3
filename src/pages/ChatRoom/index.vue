@@ -32,4 +32,14 @@
         color: green !important;
     }
 }
+// 768px
+@media screen and (max-width: 768px) {
+    // 内容
+    .container_left {
+        flex: 0.1 !important;
+    }
+    .container {
+        height: calc(100vh - 140px) !important;
+    }
+}
 </style>

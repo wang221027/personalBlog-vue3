@@ -10,7 +10,7 @@ export default function () {
   const $router = useRouter();
   // 存储所有用户的昵称
   const nicknameArr: any = ref([]);
-  let username = ref("");
+  let username: any = ref("");
   let userPassword = ref("");
   let nickname = ref("");
   let filterNickName = ref("");
@@ -40,6 +40,7 @@ export default function () {
         offset: 180,
       });
     }
+
     if (username.value.length >= 14 || userPassword.value.length >= 14) {
       return ElMessage({
         message: "用户名或密码不能超过14位！",

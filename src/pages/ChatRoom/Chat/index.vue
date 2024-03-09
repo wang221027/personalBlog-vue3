@@ -59,6 +59,12 @@ function connectSocket(data: any) {
         returnTop()
         returnUserTop()
     })
+    // 如果用户没有读取最新消息提醒用户
+    socket.on("reqMessage", (data: any) => {
+        if (data.userName != socketStore.chatType && data.infoType != '默认群聊') {
+            socket.emit("updateUserIsBlock", data.user_id)
+        }
+    })
     // 当有用户连接时更新用户列表
     socket.on("updateUserList", () => {
         // 获取用户信息
@@ -92,7 +98,7 @@ let returnUserTop = () => {
             }
         });
         if (lastElement) {
-            lastElement.scrollIntoView({  block: 'end' });
+            lastElement.scrollIntoView({ block: 'end' });
         }
     });
 }
@@ -138,11 +144,24 @@ let getUserData = async () => {
 let tabUser = (name: string) => {
     socketStore.chatType = name;
     returnUserTop()
+    socket.emit("removeMessage", socketStore.chatType)
+    if (window.innerWidth < 768) {
+        // @ts-ignore
+        document.querySelector(".container_right")!.style.display = 'block'
+        // @ts-ignore
+        document.querySelector(".container_tabbar")!.style.display = 'none'
+    }
 }
 // 默认群聊
 let defaultMessage = () => {
     socketStore.chatType = "默认群聊";
     returnTop()
+    if (window.innerWidth < 768) {
+        // @ts-ignore
+        document.querySelector(".container_right")!.style.display = 'block'
+        // @ts-ignore
+        document.querySelector(".container_tabbar")!.style.display = 'none'
+    }
 }
 // 过滤出群聊信息
 let componentDefaultMessage = computed(() => {
@@ -167,6 +186,15 @@ let computedUserMessage = computed(() => (name: any) => {
         return '你和该好友还没有聊天~';
     }
 });
+// 小屏点击后返回用户列表页面
+let returnUser = () => {
+    if (window.innerWidth < 768) {
+        // @ts-ignore
+        document.querySelector(".container_right")!.style.display = 'none'
+        // @ts-ignore
+        document.querySelector(".container_tabbar")!.style.display = 'block'
+    }
+}
 // 检测用户头像是否更新
 let watchAvatar = () => {
     let userId = localStorage.getItem("userId")
@@ -177,8 +205,8 @@ let watchAvatar = () => {
             socket.emit("updateAvatar", userAvatar)
         }
     }
-
 }
+
 onMounted(() => {
     getUserToken();
     avatar.value = localStorage.getItem("avatarUrl") as string;
@@ -195,6 +223,7 @@ onMounted(() => {
     })
     // 检测用户头像是否更新
     watchAvatar()
+    
 });
 </script>
 <template>
@@ -207,9 +236,9 @@ onMounted(() => {
                     <img src="http://43.138.70.109:8010/avatar/haizeiw.jpg" alt="">
                     <div>
                         <span>默认群聊</span>
-                        <p style="font-size: 14px;">{{ isMessage &&
+                        <p style="font-size: 14px;">{{ isMessage && componentDefaultMessage.length > 0 &&
                             componentDefaultMessage[componentDefaultMessage.length -
-                                1].content }}</p>
+                                1].content || '改群聊还没有信息~' }}</p>
                     </div>
                 </div>
                 <div class="infinite_time">
@@ -218,11 +247,14 @@ onMounted(() => {
             </li>
             <li v-for="item in socketStore.userList"
                 :class="['infinite-list-item', { active: socketStore.chatType == item.name }]" @click="tabUser(item.name)"
-                v-show="item.name != nickname">
+                v-show="item.name != nickname" :data-userMessage="item.name">
                 <div style="display: flex;align-items: center;">
                     <img :src="item.avatar" alt="">
                     <div>
-                        <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span></span>
+                        <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span>
+                            <WarningFilled style="width: 14px;margin-left: 8px;color: red;" v-if="item.is_block == 'true'">
+                            </WarningFilled>
+                        </span>
                         <p style="font-size: 14px;">{{ isUserMessage && computedUserMessage(item.name) }}</p>
                     </div>
                 </div>
@@ -235,6 +267,8 @@ onMounted(() => {
     <!-- 内容 -->
     <div class="container_right" style="position: relative;">
         <div class="container_right_top" @click="isEmojiBlock = false">
+            <ArrowLeft style="width: 20px;position: absolute;left: 10px;cursor: pointer;display: none;"
+                class="return_message" @click="returnUser" />
             {{ socketStore.chatType }}
         </div>
         <!-- 聊天内容 -->
@@ -476,5 +510,24 @@ onMounted(() => {
             bottom: 10px;
         }
     }
+}
+
+// 768px
+@media screen and (max-width: 768px) {
+
+    // 内容
+    .container_right {
+        display: none;
+        flex: 0.9;
+    }
+
+    .container_tabbar {
+        flex: 0.9;
+    }
+
+    .return_message {
+        display: block !important;
+    }
+
 }
 </style>
