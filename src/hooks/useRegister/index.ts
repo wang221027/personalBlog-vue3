@@ -5,6 +5,10 @@ import { useRouter } from "vue-router";
 import { registerUser, reqUserNickName } from "@/api/register";
 // 引入 Element-plus message消息提示
 import { ElMessage } from "element-plus";
+// 封装内容是否为汉字回调函数
+function isChinese(inputVal: string) {
+  return /^[\u4e00-\u9fff]+$/.test(inputVal);
+}
 export default function () {
   // 注册路由构造器
   const $router = useRouter();
@@ -19,6 +23,7 @@ export default function () {
     filterNickName.value = nicknameArr.value.filter(
       (item: any) => item.nickname == nickname.value
     );
+    // 判断用户昵称是否重复
     if (filterNickName.value.length > 0) {
       return ElMessage({
         message: "昵称重复！",
@@ -26,6 +31,15 @@ export default function () {
         offset: 180,
       });
     }
+    // 判断用户账号或密码是否为汉字
+    if(isChinese(username.value) || isChinese(userPassword.value)) {
+      return ElMessage({
+        message: "用户名或密码不能为汉字",
+        type: "error",
+        offset: 180,
+      });
+    }
+    // 判断昵称是否为空
     if (nickname.value == "") {
       return ElMessage({
         message: "昵称不能为空！",

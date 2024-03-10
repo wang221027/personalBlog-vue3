@@ -192,7 +192,7 @@ let computedUserMessage2 = computed(() => (name: any) => {
         return arr[arr.length - 1].time;
     } else {
         // 处理数组为空的情况，例如返回一个默认值或者抛出错误
-        return '你和该好友还没有聊天~';
+        return '未知';
     }
 });
 // 小屏点击后返回用户列表页面
@@ -243,9 +243,10 @@ onMounted(() => {
                     <img src="http://43.138.70.109:8010/avatar/haizeiw.jpg" alt="">
                     <div>
                         <span>默认群聊</span>
-                        <p style="font-size: 14px;">{{ isMessage && componentDefaultMessage.length > 0 &&
-                            componentDefaultMessage[componentDefaultMessage.length -
-                                1].content || '改群聊还没有信息~' }}</p>
+                        <p class="message_p">
+                            {{ isMessage && componentDefaultMessage.length > 0 &&
+                                componentDefaultMessage[componentDefaultMessage.length -
+                                    1].content || '改群聊还没有信息~' }}</p>
                     </div>
                 </div>
                 <div class="infinite_time">
@@ -265,7 +266,7 @@ onMounted(() => {
                     <div>
                         <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span>
                         </span>
-                        <p style="font-size: 14px;">{{ isUserMessage && computedUserMessage(item.name) }}</p>
+                        <p class="message_p">{{ isUserMessage && computedUserMessage(item.name) }}</p>
                     </div>
                 </div>
                 <div class="infinite_time">
@@ -289,13 +290,15 @@ onMounted(() => {
                         item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) ||
                         (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)"
                     :data-message="item.infoType" :data-message2="item.userName">
+                    <span class="triangle" v-show="item.type == 'user' || item.nickname != nickname"></span>
+                    <span class="triangle2" v-show="item.type == 'my' && item.nickname == nickname"></span>
                     <img :src="item.avatar" style="width: 40px;height: 40px;"
                         v-show="item.type == 'user' || item.nickname != nickname"
                         :style="{ float: item.nickname == nickname ? 'right' : 'left' }">
                     <img :src="item.avatar" style="width: 40px;height: 40px;"
                         :style="{ float: item.nickname == nickname ? 'right' : 'left' }"
                         v-show="item.type == 'my' && item.nickname == nickname">
-                    <div :style="[{ float: item.nickname == nickname ? 'right' : 'left' }]">
+                    <div :style="[{ float: item.nickname == nickname ? 'right' : 'left' },{marginRight: item.nickname == nickname ? '14px' : ''}]">
                         <span>{{ item.nickname }}</span>
                         <p :class="[{ 'row-1': item.nickname != nickname }, { 'row-2': item.nickname == nickname }]">{{
                             item.content }}</p>
@@ -372,13 +375,24 @@ onMounted(() => {
         text-overflow: ellipsis;
         /* 使用省略号表示被隐藏的文本内容 */
         white-space: nowrap;
-
+        width: 370px;
         /* 防止文本换行 */
+        position: relative;
         // 发送时间
         .infinite_time {
+            position: absolute;
+            right: 10px;
             font-size: 14px;
             color: #999;
             margin-top: -16px;
+        }
+
+        .message_p {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 270px;
         }
 
         .on_line {
@@ -433,10 +447,36 @@ onMounted(() => {
             li {
                 overflow: hidden;
                 margin: 10px 0;
+                position: relative;
 
+                .triangle {
+                    position: absolute;
+                    width: 0;
+                    height: 0;
+                    border-left: 5px solid transparent;
+                    border-right: 5px solid transparent;
+                    border-bottom: 10px solid #fff;
+                    transform: rotate(-90deg);
+                    border-radius: 0 2px 0 0;
+                    left: 46px;
+                    top: 26px;
+                }
+                .triangle2 {
+                    position: absolute;
+                    width: 0;
+                    height: 0;
+                    border-left: 5px solid transparent;
+                    border-right: 5px solid transparent;
+                    border-bottom: 10px solid #89d961;
+                    transform: rotate(90deg);
+                    border-radius: 0 2px 0 0;
+                    right: 46px;
+                    top: 26px;
+                }
                 div {
                     margin: 0 4px;
                     max-width: 60%;
+                    margin-left: 14px;
 
                     span,
                     p {
@@ -538,6 +578,8 @@ onMounted(() => {
     .return_message {
         display: block !important;
     }
+    .infinite-list-item {
+        width: 100% !important;
+    }
 
-}
-</style>
+}</style>

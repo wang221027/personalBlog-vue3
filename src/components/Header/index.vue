@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
                     <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
-                    <li><router-link to="/Community"><el-link type="success">社区</el-link></router-link></li>
+                    <li><router-link to="/Community"><el-link type="success">关于</el-link></router-link></li>
                     <li>
                         <a href="https://github.com/wang221027/vue3-ts-vite.git" target="_blank">
                             <el-link type="success">GitHub<el-icon>
