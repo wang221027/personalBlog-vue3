@@ -12,10 +12,10 @@ let getIsToken = async () => {
   const username: any = localStorage.getItem("username")
   if (username) {
     const results: any = await isToken(username)
-    if(results.length == 0) {
+    if (results.data.length == 0) {
       localStorage.clear();
     }
-  }else {
+  } else {
     localStorage.clear();
   }
 }

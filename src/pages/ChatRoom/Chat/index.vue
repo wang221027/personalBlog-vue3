@@ -4,36 +4,36 @@ import { io } from "socket.io-client";
 // 引入 Element-plus 提示信息
 import { ElMessage } from 'element-plus';
 // 引入 pinia 小创库
-import { userSocket } from '@/store/socket'
+import { userSocket } from '@/store/socket';
 const socketStore = userSocket();
 // 引入 api 接口
-import { reqUsreInfo, reqUserData } from '@/api/socket/index'
+import { reqUsreInfo, reqUserData } from '@/api/socket/index';
 // 引入字体图标样式
-import './font/xiaolian/iconfont.css'
+import './font/xiaolian/iconfont.css';
 // 引入类型
-let nickname: any = ref('')
+let nickname: any = ref('');
 // 存储用户头像
-let avatar = ref('')
+let avatar = ref('');
 // 存储用户发送的信息
-let userInfo = ref('')
+let userInfo = ref('');
 // 表情是否显示
-let isEmojiBlock = ref(false)
+let isEmojiBlock = ref(false);
 // 表情
 import data from "emoji-mart-vue-fast/data/all.json";
 // Import default CSS
 import "emoji-mart-vue-fast/css/emoji-mart.css";
 // @ts-ignore
 import { Picker, EmojiIndex } from "emoji-mart-vue-fast/src";
-const emojiIndex = new EmojiIndex(data)
+const emojiIndex = new EmojiIndex(data);
 const showEmoji = (emoji: any) => {
     userInfo.value = userInfo.value + emoji.native;
-}
+};
 // 判断用户聊天记录最后一条是否在好友列表显示
-let isMessage = ref(false)
+let isMessage = ref(false);
 // 好友列表滚动触底事件
 const load = () => {
 
-}
+};
 let getUserToken = async () => {
     const token = localStorage.getItem("token")
     if (token) {
@@ -42,9 +42,9 @@ let getUserToken = async () => {
             name: localStorage.getItem("nickname"),
             avatar: localStorage.getItem("avatarUrl")
         }
-        connectSocket(data)
+        connectSocket(data);
     }
-}
+};
 let socket: any;
 function connectSocket(data: any) {
     // 使用用户信息建立Socket连接
@@ -58,18 +58,18 @@ function connectSocket(data: any) {
         socketStore.chatMessageList = data;
         returnTop()
         returnUserTop()
-    })
+    });
     // 如果用户没有读取最新消息提醒用户
     socket.on("reqMessage", (data: any) => {
         if (data.userName != socketStore.chatType && data.infoType != '默认群聊') {
             socket.emit("updateUserIsBlock", data.user_id)
         }
-    })
+    });
     // 当有用户连接时更新用户列表
     socket.on("updateUserList", () => {
         // 获取用户信息
         getUserData();
-    })
+    });
 }
 // 封装群聊信息可视区函数
 let returnTop = () => {
@@ -85,7 +85,7 @@ let returnTop = () => {
             lastElement.scrollIntoView({ block: 'end' });
         }
     });
-}
+};
 // 封装用户聊天信息可视区函数
 let returnUserTop = () => {
     nextTick(() => {
@@ -121,25 +121,25 @@ let sendInfo = () => {
     })
     socket.emit("sendInfo", obj)
     userInfo.value = ''
-}
+};
 // 获取用户聊天记录
 let getUserInfo = async () => {
     const results: any = await reqUsreInfo()
     socketStore.chatMessageList = results.data;
     isMessage.value = true;
     isUserMessage.value = true;
-}
+};
 const input = ref('')
 // 点击后让输入框获取焦点
 let textareaFocus = () => {
     document.getElementById("textarea")?.focus()
-}
+};
 // 获取用户信息
 let getUserData = async () => {
     const results: any = await reqUserData();
     socketStore.userList = results;
     returnTop()
-}
+};
 // 点击好友回调
 let tabUser = (name: string) => {
     socketStore.chatType = name;
@@ -151,7 +151,7 @@ let tabUser = (name: string) => {
         // @ts-ignore
         document.querySelector(".container_tabbar")!.style.display = 'none'
     }
-}
+};
 // 默认群聊
 let defaultMessage = () => {
     socketStore.chatType = "默认群聊";
@@ -162,7 +162,7 @@ let defaultMessage = () => {
         // @ts-ignore
         document.querySelector(".container_tabbar")!.style.display = 'none'
     }
-}
+};
 // 过滤出群聊信息
 let componentDefaultMessage = computed(() => {
     let message: any
@@ -170,17 +170,26 @@ let componentDefaultMessage = computed(() => {
         message = socketStore.chatMessageList.filter((element: any) => element.is_type == '默认群聊')
     }
     return message;
-})
+});
 // 过滤出私聊用户信息
 let computedMessage = computed(() => {
     const message = socketStore.chatMessageList.filter((element: any) => element.is_type != '默认群聊')
     return message;
-})
+});
 let isUserMessage = ref(false)
 let computedUserMessage = computed(() => (name: any) => {
     let arr = computedMessage.value.filter((element: any) => (element.infoType === name && element.userName === nickname.value) || (element.infoType === nickname.value && element.userName === name));
     if (arr.length > 0) {
         return arr[arr.length - 1].content;
+    } else {
+        // 处理数组为空的情况，例如返回一个默认值或者抛出错误
+        return '你和该好友还没有聊天~';
+    }
+});
+let computedUserMessage2 = computed(() => (name: any) => {
+    let arr = computedMessage.value.filter((element: any) => (element.infoType === name && element.userName === nickname.value) || (element.infoType === nickname.value && element.userName === name));
+    if (arr.length > 0) {
+        return arr[arr.length - 1].time;
     } else {
         // 处理数组为空的情况，例如返回一个默认值或者抛出错误
         return '你和该好友还没有聊天~';
@@ -194,7 +203,7 @@ let returnUser = () => {
         // @ts-ignore
         document.querySelector(".container_tabbar")!.style.display = 'block'
     }
-}
+};
 // 检测用户头像是否更新
 let watchAvatar = () => {
     let userId = localStorage.getItem("userId")
@@ -205,8 +214,7 @@ let watchAvatar = () => {
             socket.emit("updateAvatar", userAvatar)
         }
     }
-}
-
+};
 onMounted(() => {
     getUserToken();
     avatar.value = localStorage.getItem("avatarUrl") as string;
@@ -223,7 +231,6 @@ onMounted(() => {
     })
     // 检测用户头像是否更新
     watchAvatar()
-    
 });
 </script>
 <template>
@@ -242,24 +249,27 @@ onMounted(() => {
                     </div>
                 </div>
                 <div class="infinite_time">
-                    2024/3/3
+                    {{ isMessage && componentDefaultMessage.length > 0 &&
+                        componentDefaultMessage[componentDefaultMessage.length -
+                            1].time }}
                 </div>
             </li>
             <li v-for="item in socketStore.userList"
                 :class="['infinite-list-item', { active: socketStore.chatType == item.name }]" @click="tabUser(item.name)"
                 v-show="item.name != nickname" :data-userMessage="item.name">
-                <div style="display: flex;align-items: center;">
+                <div style="display: flex;align-items: center;position: relative;">
                     <img :src="item.avatar" alt="">
+                    <WarningFilled style="width: 14px;margin-left: 8px;color: red;position: absolute;left: 20px;top: -3px;"
+                        v-if="item.is_block == 'true'">
+                    </WarningFilled>
                     <div>
                         <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span>
-                            <WarningFilled style="width: 14px;margin-left: 8px;color: red;" v-if="item.is_block == 'true'">
-                            </WarningFilled>
                         </span>
                         <p style="font-size: 14px;">{{ isUserMessage && computedUserMessage(item.name) }}</p>
                     </div>
                 </div>
                 <div class="infinite_time">
-                    2024/3/3
+                    {{ isUserMessage && computedUserMessage2(item.name) }}
                 </div>
             </li>
         </ul>

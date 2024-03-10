@@ -46,7 +46,7 @@ const getArticle = async () => {
 // 获取文章列表封面url
 const getArticleCover = async () => {
     const result: any = await reqArticleCoverData();
-    if (result.length > 0) {
+    if (result.data.length > 0) {
         articleCover = result.data
         isArticleCover.value = true;
     }
