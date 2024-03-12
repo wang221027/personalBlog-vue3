@@ -83,8 +83,8 @@ let getUserLogin = async () => {
     let token = GET_TOKEN();
     if (token) {
         const result: userType = await userToken();
-        const id: string = result.data.id.toString();
         if (result.status == 0) {
+            const id: string = result.data.id.toString();
             localStorage.setItem("userId", id)
             ElMessage({
                 message: `欢迎回来${result.data.nickname}`,
@@ -257,6 +257,7 @@ onBeforeUnmount(() => {
 .header {
     width: 100%;
     height: 80px;
+
     // 固定定位大盒子
     .position_fixed {
         position: fixed;
@@ -707,4 +708,5 @@ onBeforeUnmount(() => {
 .goArticle button:hover .text,
 .goArticle button.active .text {
     animation: text .66s ease-in 1 both;
-}</style>
+}
+</style>

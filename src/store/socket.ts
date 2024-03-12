@@ -8,6 +8,8 @@ export const userSocket = defineStore('socket', {
             userList: [] as any[],
             /* 聊天记录(群聊) */
             chatMessageList: [] as any[],
+            // 存储好友列表
+            userData: [] as any[],
         }
     },
     actions: {

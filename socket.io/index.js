@@ -62,3 +62,57 @@ httpServer.listen(3000, () => {
 // server = app.listen(8010, () => {
 //   console.log('api server running at http://43.138.70.109:8010');
 // });
+
+// 添加好友
+socket.on("messageUserApplyFor", (username) => {
+  socket.broadcast.emit("reqMessageApplyFor", username);
+});
+// 用户同意好友
+socket.on("consentUser", (data) => {
+  const sql = `select * from user_room WHERE username=?`;
+  db.query(sql, data.username, (err, results) => {
+    if (err) return console.log("用户同意好友错误", err.message);
+    let userArr = JSON.parse(results[0].is_user);
+    let dataArr = results[0].is_user;
+    let filterData = userArr.filter((item) => item.user_id != data.user_id);
+    let jsonArr = JSON.stringify(filterData);
+    const updateSql = `update user_room set is_user='${jsonArr}' where username=?`;
+    db.query(updateSql, data.username, (err, updateResults) => {
+      if (err) return console.log("报错999", err.message);
+      const sql2 = `select * from user_room WHERE username=?`;
+      db.query(sql2, data.username, (err, results2) => {
+        if (err) return console.log("用户同意好友错误2", err.message);
+        const userArr2 = JSON.parse(results2[0].user_list);
+        if (!userArr2) {
+          const updateUserSql = `update user_room set user_list='${dataArr}' where username=?`;
+          db.query(updateUserSql, data.username, (err, updateResults2) => {
+            if (err) return console.log("报错999", err.message);
+            res.send({
+              message: "OK",
+              status: 0,
+            });
+          });
+        } else {
+          let newUserList = [...userArr2, dataArr];
+          let jsonArr3 = JSON.stringify(newUserList);
+          console.log("newUserList", newUserList);
+          console.log("jsonArr3", jsonArr3);
+          const updateUserSql = `update user_room set user_list='${jsonArr3}' where username=?`;
+          db.query(updateUserSql, data.username, (err, updateResults2) => {
+            if (err) return console.log("报错999", err.message);
+            res.send({
+              message: "OK",
+              status: 0,
+            });
+          });
+        }
+      });
+    });
+  });
+});
+socket.on("consentUser2", (data) => {
+  console.log("consentUser2");
+});
+
+
+

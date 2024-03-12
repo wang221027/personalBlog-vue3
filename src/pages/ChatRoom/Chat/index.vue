@@ -40,9 +40,16 @@ let getUserToken = async () => {
         let data = {
             user_id: localStorage.getItem("userId"),
             name: localStorage.getItem("nickname"),
-            avatar: localStorage.getItem("avatarUrl")
+            avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+            username: localStorage.getItem("username")
         }
-        connectSocket(data);
+
+        if (localStorage.getItem("avatarUrl") == 'undefined') {
+            connectSocket(data);
+        } else {
+            data.avatar = localStorage.getItem("avatarUrl") as string
+            connectSocket(data);
+        }
     }
 };
 let socket: any;
@@ -129,15 +136,16 @@ let getUserInfo = async () => {
     isMessage.value = true;
     isUserMessage.value = true;
 };
-const input = ref('')
 // 点击后让输入框获取焦点
 let textareaFocus = () => {
     document.getElementById("textarea")?.focus()
 };
 // 获取用户信息
+let isGet = ref(false);
 let getUserData = async () => {
     const results: any = await reqUserData();
     socketStore.userList = results;
+    isGet.value = true;
     returnTop()
 };
 // 点击好友回调
@@ -198,6 +206,7 @@ let computedUserMessage2 = computed(() => (name: any) => {
 // 小屏点击后返回用户列表页面
 let returnUser = () => {
     if (window.innerWidth < 768) {
+        socketStore.chatType = ''
         // @ts-ignore
         document.querySelector(".container_right")!.style.display = 'none'
         // @ts-ignore
@@ -206,12 +215,12 @@ let returnUser = () => {
 };
 // 检测用户头像是否更新
 let watchAvatar = () => {
-    let userId = localStorage.getItem("userId")
-    let userAvatar = localStorage.getItem("avatarUrl")
-    if (userId) {
-        let filterElement: any = socketStore.userList.filter((element: any) => element.user_id == userId)
-        if (userAvatar != filterElement.avatar) {
-            socket.emit("updateAvatar", userAvatar)
+    let userId = localStorage.getItem("userId");
+    let userAvatar = localStorage.getItem("avatarUrl");
+    if (isGet && userId) {
+        let filterElement: any = socketStore.userList.filter((element) => element.user_id == userId);
+        if (filterElement && userAvatar != filterElement.avatar) {
+            socket.emit("updateAvatar", userAvatar);
         }
     }
 };
@@ -231,12 +240,15 @@ onMounted(() => {
     })
     // 检测用户头像是否更新
     watchAvatar()
+    // 如果用户在小屏让信息提示为空
+    if (window.innerWidth < 768) {
+        socketStore.chatType = ''
+    }
 });
 </script>
 <template>
     <!-- 聊天好友 -->
     <div class="container_tabbar" @click="isEmojiBlock = false">
-        <el-input v-model="input" style="width: 100%;" placeholder="搜索" />
         <ul v-infinite-scroll="load" class="infinite-list" style="overflow: auto;height: calc(100vh - 112px)">
             <li class="infinite-list-item" @click="defaultMessage" :class="{ active: socketStore.chatType == '默认群聊' }">
                 <div style="display: flex;align-items: center;">
@@ -261,7 +273,7 @@ onMounted(() => {
                 <div style="display: flex;align-items: center;position: relative;">
                     <img :src="item.avatar" alt="">
                     <WarningFilled style="width: 14px;margin-left: 8px;color: red;position: absolute;left: 20px;top: -3px;"
-                        v-if="item.is_block == 'true'">
+                        v-if="item.is_block == 'true' && item.name != socketStore.chatType">
                     </WarningFilled>
                     <div>
                         <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span>
@@ -298,7 +310,8 @@ onMounted(() => {
                     <img :src="item.avatar" style="width: 40px;height: 40px;"
                         :style="{ float: item.nickname == nickname ? 'right' : 'left' }"
                         v-show="item.type == 'my' && item.nickname == nickname">
-                    <div :style="[{ float: item.nickname == nickname ? 'right' : 'left' },{marginRight: item.nickname == nickname ? '14px' : ''}]">
+                    <div
+                        :style="[{ float: item.nickname == nickname ? 'right' : 'left' }, { marginRight: item.nickname == nickname ? '14px' : '' }]">
                         <span>{{ item.nickname }}</span>
                         <p :class="[{ 'row-1': item.nickname != nickname }, { 'row-2': item.nickname == nickname }]">{{
                             item.content }}</p>
@@ -378,6 +391,7 @@ onMounted(() => {
         width: 370px;
         /* 防止文本换行 */
         position: relative;
+
         // 发送时间
         .infinite_time {
             position: absolute;
@@ -423,7 +437,7 @@ onMounted(() => {
 
 // 内容
 .container_right {
-    flex: .78;
+    flex: .80;
     border-left: 1px solid #ccc;
 
     // 顶部
@@ -461,6 +475,7 @@ onMounted(() => {
                     left: 46px;
                     top: 26px;
                 }
+
                 .triangle2 {
                     position: absolute;
                     width: 0;
@@ -473,6 +488,7 @@ onMounted(() => {
                     right: 46px;
                     top: 26px;
                 }
+
                 div {
                     margin: 0 4px;
                     max-width: 60%;
@@ -537,7 +553,6 @@ onMounted(() => {
     .send_container {
         height: 80%;
         position: relative;
-
         .textarea__inner {
             display: block;
             width: 100%;
@@ -564,22 +579,36 @@ onMounted(() => {
 
 // 768px
 @media screen and (max-width: 768px) {
-
     // 内容
     .container_right {
         display: none;
         flex: 0.9;
     }
-
     .container_tabbar {
         flex: 0.9;
+        height: calc(100vh - 140px) !important;
     }
-
+    .infinite-list {
+        height: calc(100vh - 140px) !important;
+    }
     .return_message {
         display: block !important;
     }
     .infinite-list-item {
         width: 100% !important;
     }
-
-}</style>
+    .is_hidden {
+        top: 164px !important;
+    }
+    .emoji-mart {
+        width: 250px !important;
+        height: 300px;
+    }
+    /deep/ .emoji-mart-bar:last-child {
+        display: none !important;
+    }
+    /deep/ .emoji-mart-anchor {
+        padding: 12px 1px;
+    }
+}
+</style>

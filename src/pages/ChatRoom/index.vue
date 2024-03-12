@@ -23,23 +23,26 @@
 
     // 侧边栏
     .container_left {
-        flex: 0.05;
+        flex: 0.03;
         background-color: #333;
         display: flex;
         flex-direction: column;
     }
+
     .color_active svg {
         color: green !important;
     }
 }
+
 // 768px
 @media screen and (max-width: 768px) {
+
     // 内容
     .container_left {
         flex: 0.1 !important;
     }
+
     .container {
         height: calc(100vh - 140px) !important;
     }
-}
-</style>
+}</style>
