@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted, computed, reactive } from "vue"
 // 引入api
-import { reqArticle, reqArticleCoverData } from '@/api/home'
+import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home'
 // 引入类型
 import { isArticleData } from '@/api/home/type'
 // 引入router构造器
@@ -39,6 +39,8 @@ const getArticle = async () => {
     });
     total.value = articleData.value.length;
     isInit.value = true;
+    // 获取用户所有评论
+    getUserComment();
     // 每次刷新都随机展示数据
     randomDisplay(randomArticles.value)
     randomDisplay(reqArticles.value)
@@ -99,7 +101,17 @@ const randomDisplay = (data: any) => {
         data.push(articles[index]);
     });
 }
-
+// 获取用户所有评论
+let userComment = reactive([])
+let isUserCommentBlock = ref(false)
+let getUserComment = async () => {
+    const result = await reqUserComment();
+    userComment = result.data;
+    isUserCommentBlock.value = true;
+}
+let computedUserComment = computed(() => (id: string) => {
+    return userComment.filter((element: any) => element.commentId == id)
+})
 // 在页面渲染完成后获取数据
 onMounted(() => {
     // 获取文章数据
@@ -161,6 +173,10 @@ onMounted(() => {
                                     </div>
                                     <div style="display: flex;justify-content: space-between;">
                                         <p>作者：{{ item.nickname }}</p>
+                                        <div style="font-size: 14px;display: flex;align-items: center;">
+                                            <ChatDotRound style="width: 16px;" />
+                                            ({{ isUserCommentBlock && computedUserComment(item.id).length }})
+                                        </div>
                                     </div>
                                 </div>
                             </div>

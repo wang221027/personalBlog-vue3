@@ -553,6 +553,7 @@ onMounted(() => {
     .send_container {
         height: 80%;
         position: relative;
+
         .textarea__inner {
             display: block;
             width: 100%;
@@ -579,36 +580,44 @@ onMounted(() => {
 
 // 768px
 @media screen and (max-width: 768px) {
+
     // 内容
     .container_right {
         display: none;
         flex: 0.9;
     }
+
     .container_tabbar {
         flex: 0.9;
         height: calc(100vh - 140px) !important;
     }
+
     .infinite-list {
         height: calc(100vh - 140px) !important;
     }
+
     .return_message {
         display: block !important;
     }
+
     .infinite-list-item {
         width: 100% !important;
     }
+
     .is_hidden {
         top: 164px !important;
     }
+
     .emoji-mart {
         width: 250px !important;
         height: 300px;
     }
+
     /deep/ .emoji-mart-bar:last-child {
         display: none !important;
     }
+
     /deep/ .emoji-mart-anchor {
         padding: 12px 1px;
     }
-}
-</style>
+}</style>

@@ -7,8 +7,12 @@ enum API {
     ARTICLE_URL = '/api/list',
     // 获取文章列表封面url数据
     ARTICLE_COVER_URL = '/api/getTitleUrl',
+    // 获取用户所有评论
+    REQ_USER_COMMENT = '/my/article/getUserComment'
 }
 //获取文章列表数据
 export const reqArticle = () => request.get<any, isArticleData>(API.ARTICLE_URL)
 // 获取文章列表封面url数据m
 export const reqArticleCoverData = () => request.get<any, isArticleCover>(API.ARTICLE_COVER_URL)
+// 获取用户所有评论
+export const reqUserComment = () => request.get(API.REQ_USER_COMMENT)

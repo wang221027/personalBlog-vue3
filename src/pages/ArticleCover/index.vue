@@ -89,7 +89,6 @@ let publish = async () => {
         formLabelAlign.alias = ''
     }
 }
-
 // 获取所有评论
 let getComments = async () => {
     const results = await reqComments()
@@ -99,8 +98,6 @@ let getComments = async () => {
 let isCreate = ref(true)
 // 回复评论
 const addFormElement = (e: any) => {
-    console.log(e.target);
-    
     if(token == '') {
         return ElMessage({
             message: '登录后解释评论功能！',
@@ -326,6 +323,7 @@ onMounted(() => {
             padding: 20px;
             flex: 0.65;
             border: 1px solid #ccc;
+            box-sizing: border-box;
             // 回复
             .reply {
                 display: inline-block;
@@ -421,23 +419,11 @@ onMounted(() => {
     .main {
         width: 600px !important;
     }
-}
-
-// 600px
-@media screen and (max-width: 650px) {
-
-    // 主体
-    .main {
-        width: 500px !important;
+    .main_left {
+        width: 100%;
     }
-}
-
-// 500px
-@media screen and (max-width: 500px) {
-
-    // 主体
-    .main {
-        width: 400px !important;
+    .main_right {
+        width: 100%;
     }
 }
 </style>
