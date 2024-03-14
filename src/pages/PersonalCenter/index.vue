@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,Ref } from 'vue'
 // 引入路由构造器
 import { useRouter, useRoute } from 'vue-router'
 // 注册路由构造器
@@ -11,22 +11,24 @@ import $bus from '@/utils/event-bus'
 import { ElMessage } from 'element-plus'
 // 引入根据用户id获取文章列表和封面api
 import { getUserIdList, getUserIdCover, delUserList, reqUserEmail } from '@/api/PersonalCenter'
+// 引入类型
+import type {isArticleData, articleListData,coverData,isArticleCoverType} from '@/api/home/type'
 // 存储用户文章列表
-let userListData: any = ref([])
+let userListData: Ref<articleListData[]> = ref([])
 // 列表封面url集合
-let userIdCoverData: any = ref([])
+let userIdCoverData: Ref<coverData[]> = ref([])
 // 用户个人简介
 let userInfo = ref('您还没有设置个人简介~')
 // 存储用户列表总数量
 let total = ref<number>(0)
 // 用户头像url
-let avatarUrl: any = ref(null)
+let avatarUrl = ref('')
 // 用户昵称
-let nickname: any = ref("")
+let nickname = ref("")
 // 根据用户id获取文章列表
 let getUserIdListData = async () => {
-    const results: any = await getUserIdList()
-    const filterResults = results
+    const results: isArticleData = await getUserIdList()
+    const filterResults = results;
     filterResults.data.forEach((item: any, index: number) => {
         item.init_id = (index + 1);
     });
@@ -37,7 +39,7 @@ let getUserIdListData = async () => {
 }
 // 根据用户id获取文章封面
 let getUserIdCoverData = async () => {
-    const results: any = await getUserIdCover()
+    const results: isArticleCoverType = await getUserIdCover()
     const filterResults = results;
     filterResults.data.forEach((item: any, index: number) => {
         item.init_id = (index + 1);
@@ -46,12 +48,12 @@ let getUserIdCoverData = async () => {
 }
 // 从本地获取用户头像url
 let getUserIdCoverUrl = () => {
-    const getAvatarUrl = localStorage.getItem("avatarUrl");
+    const getAvatarUrl = localStorage.getItem("avatarUrl") as string;
     avatarUrl.value = getAvatarUrl
 }
 // 从本地获取用户昵称
 let getUserNickName = () => {
-    const getUserNickName = localStorage.getItem("nickname");
+    const getUserNickName = localStorage.getItem("nickname") as string;
     nickname.value = getUserNickName
 }
 // 删除文章
@@ -116,7 +118,7 @@ onMounted(() => {
     }
 })
 // 编辑
-let compile = (id: string, name: string, type: string, alias: string) => {
+let compile = (id: number, name: string, type: string, alias: string) => {
     $router.push({ name: 'article', query: { isShow: 'true', id, name, type, alias } })
 }
 </script>
@@ -179,19 +181,19 @@ let compile = (id: string, name: string, type: string, alias: string) => {
                 <ul>
                     <li v-for="item in userListData" :key="item.id" :style="{}">
                         <div class="title_flex" :style="{
-                            height: userIdCoverData[item.init_id - 1]?.file == 'show' ? '280px' : ''
+                            height: userIdCoverData[item.init_id! - 1]?.file == 'show' ? '280px' : ''
                         }"
-                            v-if="userListData[total - item.init_id] && userListData[total - item.init_id].is_delete == 0">
+                            v-if="userListData[total - item.init_id!] && userListData[total - item.init_id!].is_delete == 0">
                             <div class="title_bg" :style="{
-                                backgroundImage: item.id === userListData[total - item.init_id]?.id ? `url(${userIdCoverData[item.init_id - 1]?.title_url})` : '',
+                                backgroundImage: item.id === userListData[total - item.init_id!]?.id ? `url(${userIdCoverData[item.init_id! - 1]?.title_url})` : '',
                                 backgroundSize: 'contain',
                                 backgroundPosition: 'center',
                                 backgroundRepeat: 'no-repeat',
                                 margin: '0 auto'
-                            }" v-if="userIdCoverData[item.init_id - 1]?.file === 'show'">
+                            }" v-if="userIdCoverData[item.init_id! - 1]?.file === 'show'">
                             </div>
                             <div class="title_content"
-                                :style="{ flex: userIdCoverData[item.init_id - 1]?.file === 'show' ? '0.6' : '1' }"
+                                :style="{ flex: userIdCoverData[item.init_id! - 1]?.file === 'show' ? '0.6' : '1' }"
                                 :data-title-id="item.id">
                                 <el-link type="primary" class="link-h1" @click="goArticleCover(item.id)">{{ item.name
                                 }}</el-link>

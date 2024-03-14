@@ -11,3 +11,19 @@ export interface userType {
         message: string
     }
 }
+// 获取头像类型
+export interface userAvatarType {
+    data: string | number[],
+    message: string,
+    status: number
+}
+// 发请求根据id获取用户头像url
+type userAvatarUrlResultsType = {
+    id: number,
+    title_url: string
+}
+export interface userAvatarUrlType {
+    data: userAvatarUrlResultsType[],
+    message: string,
+    status: number
+}

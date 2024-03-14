@@ -1,16 +1,16 @@
 <script setup lang='ts'>
-import { ref, onMounted, computed, reactive } from "vue"
+import { ref, onMounted, computed, reactive, Ref } from "vue"
 // 引入api
 import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home'
 // 引入类型
-import { isArticleData } from '@/api/home/type'
+import type { isArticleData,articleListData, isArticleCoverType, coverData,userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
 import { useRouter } from 'vue-router'
 // 引入字体图标样式
 import '@/pages/MyHome/font/iconfont.css'
 const $router = useRouter();
 // 文章列表数据
-let articleData: any = ref([])
+let articleData: Ref<articleListData[]> = ref([])
 // 文章列表是否显示
 let isInit = ref<boolean>(false)
 // 文章列表封面是否显示
@@ -18,7 +18,7 @@ let isArticleCover = ref<boolean>(false)
 // 文章列表总数量
 let total = ref<number>(0)
 // 文章列表封面url
-let articleCover: any = ref([])
+let articleCover: Ref<coverData[]> = ref([]);
 // 分页器当前页码
 let currentPage = ref(1)
 // 分页器一页显示几个
@@ -26,7 +26,7 @@ let pageSize = ref(10)
 // 计算是否显示后的总数量
 let totalSplice = ref(0)
 // 轮播图url
-const bannerUrl = reactive([
+const bannerUrl: string[] = reactive([
     'http://43.138.70.109:8010/head/zhi.webp',
     'http://43.138.70.109:8010/head/web.webp'
 ])
@@ -47,9 +47,9 @@ const getArticle = async () => {
 }
 // 获取文章列表封面url
 const getArticleCover = async () => {
-    const result: any = await reqArticleCoverData();
+    const result: isArticleCoverType = await reqArticleCoverData();
     if (result.data.length > 0) {
-        articleCover = result.data
+        articleCover.value = result.data
         isArticleCover.value = true;
     }
 }
@@ -86,10 +86,10 @@ let paginationList = computed(() => {
     return list;
 })
 // 随机展示10条文章列表
-const randomArticles: any = ref([]);
-const reqArticles: any = ref([])
+const randomArticles: Ref<articleListData[]> = ref([]);
+const reqArticles: Ref<articleListData[]> = ref([])
 const randomDisplay = (data: any) => {
-    const randomIndexes: any = [];
+    const randomIndexes: number[] = [];
     const articles = articleData.value;
     while (randomIndexes.length < articles.length) {
         const randomIndex = Math.floor(Math.random() * articles.length);
@@ -102,14 +102,14 @@ const randomDisplay = (data: any) => {
     });
 }
 // 获取用户所有评论
-let userComment = reactive([])
+let userComment: userCommentResultType[] = reactive([])
 let isUserCommentBlock = ref(false)
 let getUserComment = async () => {
-    const result = await reqUserComment();
+    const result: userCommentType = await reqUserComment();
     userComment = result.data;
     isUserCommentBlock.value = true;
 }
-let computedUserComment = computed(() => (id: string) => {
+let computedUserComment = computed(() => (id: number) => {
     return userComment.filter((element: any) => element.commentId == id)
 })
 // 在页面渲染完成后获取数据

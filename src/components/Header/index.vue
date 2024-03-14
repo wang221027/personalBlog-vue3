@@ -11,17 +11,18 @@ import { GET_TOKEN } from '@/utils/user'
 // 引入 Element-plus message消息提示
 import { ElMessage } from 'element-plus'
 // 引入类型判断
-import type { userType } from '@/api/header/type'
+import type { userType, userAvatarType,userAvatarUrlType } from '@/api/header/type'
+import type {isArticleData} from '@/api/home/type'
 // 引入获取文章列表api
 import { reqArticle } from '@/api/home'
 // 获取路由器对象
 let $router = useRouter();
 // 登录注册按钮是否显示
-let isLoginAndRegisterShow: any = ref('true')
+let isLoginAndRegisterShow = ref<string>('true')
 // 用户头像是否显示
 let isShow = ref(false)
 // 存储用户头像url
-let avatarUrl = ref(null)
+let avatarUrl = ref('')
 // 用户选择的头像地址
 let file: any = ref(null)
 // 导航栏是否加类名
@@ -62,7 +63,6 @@ const createFilter = (queryString: string) => {
     }
 }
 const handleSelect = (item: Record<string, any>) => {
-    // console.log(item)
     $router.push({ name: 'cover', query: { id: item.link } })
     state.value = ''
 }
@@ -101,9 +101,9 @@ let getUserLogin = async () => {
 }
 // 发请求根据id获取用户头像url
 let getInIdArticleCover = async () => {
-    const id: any = localStorage.getItem("userId");
+    const id: string = localStorage.getItem("userId") as string;
     if (id) {
-        const results: any = await reqArticleCover(id)
+        const results: userAvatarUrlType = await reqArticleCover(id)
         avatarUrl.value = results.data[0]?.title_url;
         localStorage.setItem("avatarUrl", results.data[0]?.title_url)
     }
@@ -137,8 +137,8 @@ let uploadAvatar = async () => {
     }
     let formData = new FormData();
     formData.append("avatar", file.value);
-    const results = await unDateUserCover(formData)
-    localStorage.setItem("avatarUrl", results.data[0].title_url)
+    const results: userAvatarType = await unDateUserCover(formData)
+    localStorage.setItem("avatarUrl", results.data[0] as string)
     getInIdArticleCover()
     $bus.emit("updateCoverUrl");
     $bus.emit("updateUserUrl")
@@ -155,7 +155,7 @@ let handleScroll = () => {
 }
 // 获取文章列表
 let getUserList = async () => {
-    const results = await reqArticle()
+    const results: isArticleData = await reqArticle()
     userListData.value = results.data;
     links.value = loadAll()
 }
@@ -164,7 +164,7 @@ onMounted(() => {
     getUserList()
     // 绑定事件
     $bus.on("isLoginShow", (bool) => {
-        isLoginAndRegisterShow.value = bool;
+        isLoginAndRegisterShow.value = bool as string;
     })
     // 判断是否有token，如果有就显示用户欢迎回来
     getUserLogin()

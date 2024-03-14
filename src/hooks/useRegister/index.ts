@@ -1,8 +1,10 @@
 // * 注册模块
-import { ref, onMounted } from "vue";
+import { ref, onMounted, Ref } from "vue";
 import { useRouter } from "vue-router";
 // 引入注册 方法
 import { registerUser, reqUserNickName } from "@/api/register";
+// 引入类型
+import type { registerUserType, reqUserNickNameType } from "@/api/register/type";
 // 引入 Element-plus message消息提示
 import { ElMessage } from "element-plus";
 // 封装内容是否为汉字回调函数
@@ -14,7 +16,7 @@ export default function () {
   const $router = useRouter();
   // 存储所有用户的昵称
   const nicknameArr: any = ref([]);
-  let username: any = ref("");
+  let username = ref("");
   let userPassword = ref("");
   let nickname = ref("");
   let filterNickName = ref("");
@@ -32,7 +34,7 @@ export default function () {
       });
     }
     // 判断用户账号或密码是否为汉字
-    if(isChinese(username.value) || isChinese(userPassword.value)) {
+    if (isChinese(username.value) || isChinese(userPassword.value)) {
       return ElMessage({
         message: "用户名或密码不能为汉字",
         type: "error",
@@ -54,7 +56,6 @@ export default function () {
         offset: 180,
       });
     }
-
     if (username.value.length >= 14 || userPassword.value.length >= 14) {
       return ElMessage({
         message: "用户名或密码不能超过14位！",
@@ -69,7 +70,7 @@ export default function () {
         offset: 180,
       });
     }
-    const results: any = await registerUser(
+    const results: registerUserType = await registerUser(
       nickname.value,
       username.value,
       userPassword.value
@@ -98,7 +99,7 @@ export default function () {
   };
   // 获取用户昵称
   let getUserNickName = async () => {
-    const results = await reqUserNickName();
+    const results: reqUserNickNameType = await reqUserNickName();
     nicknameArr.value = results.data;
   };
   onMounted(() => {

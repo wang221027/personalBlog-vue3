@@ -302,17 +302,20 @@ onMounted(() => {
                         item.userName == socketStore.chatType && item.infoType != '默认群聊' && item.infoType == nickname) ||
                         (item.infoType == '默认群聊' && item.is_type == socketStore.chatType)"
                     :data-message="item.infoType" :data-message2="item.userName">
+                    <!-- 三角形 -->
                     <span class="triangle" v-show="item.type == 'user' || item.nickname != nickname"></span>
                     <span class="triangle2" v-show="item.type == 'my' && item.nickname == nickname"></span>
+                    <!-- 头像 -->
                     <img :src="item.avatar" style="width: 40px;height: 40px;"
                         v-show="item.type == 'user' || item.nickname != nickname"
                         :style="{ float: item.nickname == nickname ? 'right' : 'left' }">
                     <img :src="item.avatar" style="width: 40px;height: 40px;"
                         :style="{ float: item.nickname == nickname ? 'right' : 'left' }"
                         v-show="item.type == 'my' && item.nickname == nickname">
+                    <!-- 聊天内容 -->
                     <div
-                        :style="[{ float: item.nickname == nickname ? 'right' : 'left' }, { marginRight: item.nickname == nickname ? '14px' : '' }]">
-                        <span>{{ item.nickname }}</span>
+                        :style="[{ float: item.nickname == nickname ? 'right' : 'left' }, { marginRight: item.nickname == nickname ? '14px' : '' }, { marginTop: item.nickname == nickname ? '6px' : '' }]">
+                        <span v-if="item.nickname != nickname">{{ item.nickname }}</span>
                         <p :class="[{ 'row-1': item.nickname != nickname }, { 'row-2': item.nickname == nickname }]">{{
                             item.content }}</p>
                     </div>
@@ -434,7 +437,6 @@ onMounted(() => {
         margin-right: 10px;
     }
 }
-
 // 内容
 .container_right {
     flex: .80;
@@ -449,14 +451,12 @@ onMounted(() => {
         background-color: #f5f5f5;
         border-bottom: 1px solid #ccc;
     }
-
     // 聊天内容
     .container_right_content {
         height: 66%;
         overflow: auto;
         padding: 0 6px;
         background-color: #f5f5f5;
-
         ul {
             li {
                 overflow: hidden;
@@ -486,7 +486,7 @@ onMounted(() => {
                     transform: rotate(90deg);
                     border-radius: 0 2px 0 0;
                     right: 46px;
-                    top: 26px;
+                    top: 16px;
                 }
 
                 div {
@@ -620,4 +620,5 @@ onMounted(() => {
     /deep/ .emoji-mart-anchor {
         padding: 12px 1px;
     }
-}</style>
+}
+</style>

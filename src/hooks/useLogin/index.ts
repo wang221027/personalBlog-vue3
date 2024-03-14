@@ -50,7 +50,7 @@ export default function () {
     $router.push({ name: "register" });
   };
   onMounted(() => {
-    const getUsername: any = $route.query.username;
+    const getUsername: string = $route.query.username as string;
     if (getUsername) {
       username.value = getUsername;
     }

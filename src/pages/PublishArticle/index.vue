@@ -12,7 +12,6 @@ import { ElMessage } from 'element-plus'
 // import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 // // 编辑器实例，必须用 shallowRef
 // const editorRef = shallowRef()
-
 // // 内容 HTML
 // const valueHtml = ref('')
 // const toolbarConfig = {}
@@ -25,10 +24,12 @@ import {
     reqPublishArticle, reqPublishArticleAndCover, reqPublishArticleAndCoverDel, reqPutArticleList
     , reqPutArticleCover, reqPutArticleCoverNo
 } from '@/api/PublishArticle'
+// 引入类型
+import type {formLabelAlignType} from '@/api/PublishArticle/type'
 // 顶部对齐方式
 let labelPosition = ref<string>("top")
 // 表单数据
-let formLabelAlign: any = reactive({
+let formLabelAlign: formLabelAlignType = reactive({
     name: "",
     alias: "",
     type: [],
@@ -68,13 +69,12 @@ let handleFileUpload = (event: any) => {
 // 发布文章
 let tonSubmit = async () => {
     // 校验输入框是否为空
-    if (formLabelAlign.type == '' || formLabelAlign.name == '' || formLabelAlign.alias == '') {
-        ElMessage({
+    if (formLabelAlign.type.length == 0 || formLabelAlign.name == '' || formLabelAlign.alias == '') {
+        return ElMessage({
             message: '名字或类型或内容不允许为空！',
             type: 'error',
             offset: 100
         })
-        return;
     } else {
         // 获取用户昵称
         const nickname: any = localStorage.getItem("nickname")
@@ -111,16 +111,15 @@ let tonSubmit = async () => {
 }
 // 修改文章
 let putSubmit = async () => {
-    if (formLabelAlign.type == '' || formLabelAlign.name == '' || formLabelAlign.alias == '') {
-        ElMessage({
+    if (formLabelAlign.type.length == 0 || formLabelAlign.name == '' || formLabelAlign.alias == '') {
+        return ElMessage({
             message: '名字或类型或内容不允许为空！',
             type: 'error',
             offset: 100
         })
-        return;
     } else {
         const type = formLabelAlign.type.join("，");
-        const id: any = $route.query.id;
+        const id: string = $route.query.id as string;
         await reqPutArticleList(formLabelAlign.name, formLabelAlign.alias, type, id)
         if (file.value != null) {
             // 根据id修改封面url
@@ -152,9 +151,9 @@ onMounted(() => {
     }
     // 点击编辑跳转过来让点击的标题、类型、文章赋值给现在的显示
     if ($route.query.name && $route.query.type && $route.query.alias) {
-        formLabelAlign.name = $route.query.name;
-        formLabelAlign.type.push($route.query.type);
-        formLabelAlign.alias = $route.query.alias;
+        formLabelAlign.name = $route.query.name as string;
+        formLabelAlign.type.push($route.query.type as string);
+        formLabelAlign.alias = $route.query.alias as string;
     }
     // 动态修改网页标题
     document.title = title.value;
