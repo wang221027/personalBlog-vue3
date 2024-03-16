@@ -11,8 +11,8 @@ import { GET_TOKEN } from '@/utils/user'
 // 引入 Element-plus message消息提示
 import { ElMessage } from 'element-plus'
 // 引入类型判断
-import type { userType, userAvatarType,userAvatarUrlType } from '@/api/header/type'
-import type {isArticleData} from '@/api/home/type'
+import type { userType, userAvatarType, userAvatarUrlType } from '@/api/header/type'
+import type { isArticleData } from '@/api/home/type'
 // 引入获取文章列表api
 import { reqArticle } from '@/api/home'
 // 获取路由器对象
@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
                     <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
-                    <li><router-link to="/Community"><el-link type="success">关于</el-link></router-link></li>
+                    <li><router-link to="/adminLogin"><el-link type="success">后台管理系统</el-link></router-link></li>
                     <li>
                         <a href="https://github.com/wang221027/vue3-ts-vite.git" target="_blank">
                             <el-link type="success">GitHub<el-icon>

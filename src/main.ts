@@ -48,8 +48,6 @@ app.component("GoBack", GoBack);
 app.component("Bottom", Bottom);
 // 将底部tab组件注册为全局组件
 app.component("footerTab", footerTab);
-// 引入富文本插件
-
 // 注册 pinia 创库
 app.use(pinia);
 //安装vue-router

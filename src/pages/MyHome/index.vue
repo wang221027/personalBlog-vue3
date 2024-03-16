@@ -49,8 +49,10 @@ const getArticle = async () => {
 const getArticleCover = async () => {
     const result: isArticleCoverType = await reqArticleCoverData();
     if (result.data.length > 0) {
-        articleCover.value = result.data
-        isArticleCover.value = true;
+        articleCover.value = result.data;
+        if(articleCover.value.length > 0) {
+            isArticleCover.value = true;
+        }
     }
 }
 // 点击标题跳转到对应的文章详情

@@ -1,5 +1,5 @@
 // * 注册模块
-import { ref, onMounted, Ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 // 引入注册 方法
 import { registerUser, reqUserNickName } from "@/api/register";
