@@ -3,7 +3,7 @@ import { ref, onMounted, computed, reactive, Ref } from "vue"
 // 引入api
 import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home'
 // 引入类型
-import type { isArticleData,articleListData, isArticleCoverType, coverData,userCommentResultType, userCommentType } from '@/api/home/type'
+import type { isArticleData, articleListData, isArticleCoverType, coverData, userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
 import { useRouter } from 'vue-router'
 // 引入字体图标样式
@@ -50,7 +50,7 @@ const getArticleCover = async () => {
     const result: isArticleCoverType = await reqArticleCoverData();
     if (result.data.length > 0) {
         articleCover.value = result.data;
-        if(articleCover.value.length > 0) {
+        if (articleCover.value.length > 0) {
             isArticleCover.value = true;
         }
     }
@@ -112,7 +112,9 @@ let getUserComment = async () => {
     isUserCommentBlock.value = true;
 }
 let computedUserComment = computed(() => (id: number) => {
-    return userComment.filter((element: any) => element.commentId == id)
+    if (userComment) {
+        return userComment.filter((element: any) => element.commentId == id)
+    }
 })
 // 在页面渲染完成后获取数据
 onMounted(() => {
@@ -177,7 +179,7 @@ onMounted(() => {
                                         <p>作者：{{ item.nickname }}</p>
                                         <div style="font-size: 14px;display: flex;align-items: center;">
                                             <ChatDotRound style="width: 16px;" />
-                                            ({{ isUserCommentBlock && computedUserComment(item.id).length }})
+                                            ({{ isUserCommentBlock && computedUserComment(item.id)?.length || 0 }})
                                         </div>
                                     </div>
                                 </div>
