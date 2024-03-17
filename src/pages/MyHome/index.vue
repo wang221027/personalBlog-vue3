@@ -1,34 +1,35 @@
 <script setup lang='ts'>
-import { ref, onMounted, computed, reactive, Ref } from "vue"
+import { ref, onMounted, computed, reactive, Ref } from "vue";
 // 引入api
-import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home'
+import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home';
 // 引入类型
 import type { isArticleData, articleListData, isArticleCoverType, coverData, userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
 // 引入字体图标样式
-import '@/pages/MyHome/font/iconfont.css'
+import '@/pages/MyHome/font/iconfont.css';
 const $router = useRouter();
 // 文章列表数据
-let articleData: Ref<articleListData[]> = ref([])
+let articleData: Ref<articleListData[]> = ref([]);
 // 文章列表是否显示
-let isInit = ref<boolean>(false)
+let isInit = ref<boolean>(false);
 // 文章列表封面是否显示
-let isArticleCover = ref<boolean>(false)
+let isArticleCover = ref<boolean>(false);
 // 文章列表总数量
-let total = ref<number>(0)
+let total = ref<number>(0);
 // 文章列表封面url
 let articleCover: Ref<coverData[]> = ref([]);
 // 分页器当前页码
-let currentPage = ref(1)
+let currentPage = ref(1);
 // 分页器一页显示几个
-let pageSize = ref(10)
+let pageSize = ref(10);
 // 计算是否显示后的总数量
-let totalSplice = ref(0)
+let totalSplice = ref(0);
 // 轮播图url
 const bannerUrl: string[] = reactive([
     'http://43.138.70.109:8010/head/zhi.webp',
-    'http://43.138.70.109:8010/head/web.webp'
+    'http://43.138.70.109:8010/head/web.webp',
+    'http://43.138.70.109:8010/head/04.webp'
 ])
 // 获取文章数据
 const getArticle = async () => {
@@ -136,8 +137,8 @@ onMounted(() => {
         <section class="header_content">
             <img src="http://43.138.70.109:8010/head/hei.jpg" alt="">
             <p>
-                有需要<span style="color: #ceefea;">(前端/移动开发)</span><br>的朋友可以联系我 <br>
-                微信在底部
+                <span style="color: #ceefea;">前端/移动开发</span><br>Node.js <br>
+                MySQL
             </p>
         </section>
     </header>

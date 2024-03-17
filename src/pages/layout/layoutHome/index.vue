@@ -65,10 +65,9 @@ onMounted(() => {
 </script>
 <template>
     <div class="title">
-        <p>admin <br>欢迎回来！</p>
+        <p>主人 <br>欢迎回来！</p>
     </div>
     <section>
-
         <div ref="main" style="width: 100%; height: 400px;margin-top: 20px;"></div>
     </section>
 </template>
@@ -76,6 +75,10 @@ onMounted(() => {
 .title {
     padding: 20px;
     margin-bottom: 20px;
+    p {
+        color: green;
+        font-weight: 600;
+    }
 }
 section {
     width: 100%;

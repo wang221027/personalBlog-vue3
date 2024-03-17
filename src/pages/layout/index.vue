@@ -33,6 +33,7 @@ let routes = reactive([
                 <img src="/public/logo.jpg" alt="">
                 <h4>博客系统后台管理</h4>
             </div>
+            <!-- 导航 -->
             <ul>
                 <li v-for="route in routes">
                     <router-link :to="route.path" active-class="router_active">
@@ -45,6 +46,10 @@ let routes = reactive([
                     </router-link>
                 </li>
             </ul>
+            <!-- 女仆背景 -->
+            <div class="bg">
+                <img src="./images/cute.gif" alt="">
+            </div>
         </div>
         <!-- 内容 -->
         <div class="container_right">
@@ -62,7 +67,7 @@ let routes = reactive([
     .container_left {
         flex: .2;
         background-color: #001529;
-
+        position: relative;
         // 头部
         .container_header {
             display: flex;
@@ -81,7 +86,7 @@ let routes = reactive([
                 font-weight: 400;
             }
         }
-
+        // 导航
         ul {
             li {
                 transition: all .3s;
@@ -112,6 +117,16 @@ let routes = reactive([
                 a:hover {
                     background-color: #4e5465;
                 }
+            }
+        }
+        // 女仆背景
+        .bg {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            img {
+                width: 120px;
             }
         }
     }
