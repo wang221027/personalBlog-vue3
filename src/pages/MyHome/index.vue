@@ -130,6 +130,7 @@ const computedLike = computed(() => (likeList: any) => {
         return result.length;
     }
 })
+// 点赞高亮是否显示
 const isLike = computed(() => (likeList: any) => {
     let likeArr = JSON.parse(likeList)
     if (likeArr) {
@@ -202,12 +203,12 @@ onMounted(() => {
                                     </div>
                                     <div style="display: flex;justify-content: space-between;">
                                         <p>作者：{{ item.nickname }}</p>
-                                        <div style="font-size: 14px;display: flex;align-items: center;">
+                                        <div style="font-size: 14px;display: flex;align-items: center;position: relative;">
                                             <span class="iconfont icon-dianzan" style="cursor: pointer;"
                                                 @click="like(item.id)"
                                                 :style="{ color: isLike(item.likeList) == true ? 'red' : '' }"></span>
-                                            ({{ computedLike(item.likeList) }})
-                                            <ChatDotRound style="width: 16px;margin-left: 10px;" />
+                                            <span>{{ computedLike(item.likeList) || 0 }}</span>赞
+                                            <ChatDotRound style="width: 16px;margin-left: 30px;" />
                                             ({{ isUserCommentBlock && computedUserComment(item.id)?.length || 0 }})
                                         </div>
                                     </div>
