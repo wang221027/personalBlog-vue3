@@ -1,5 +1,7 @@
 // 统一管理文章详情
 import request from "@/utils/request";
+// 引入类型
+import type {isArticleData,isArticleCoverType} from '@/api/home/type'
 enum API {
     // 根据用户id获取文章列表
     USER_ID_LIST = '/my/getUserIdList',
@@ -12,14 +14,14 @@ enum API {
 }
 // 根据用户id获取文章列表
 export const getUserIdList = () => {
-    return request({
+    return request<string, isArticleData>({
         url: API.USER_ID_LIST,
         method: 'POST',
     })
 };
 // 根据用户id获取文章封面
 export const getUserIdCover = () => {
-    return request({
+    return request<string, isArticleCoverType>({
         url: API.USER_ID_COVER,
     })
 };

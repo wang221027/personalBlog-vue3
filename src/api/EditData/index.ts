@@ -1,6 +1,8 @@
 //统一管理首页模块接口
 import request from "@/utils/request";
 import qs from 'qs'
+// 引入类型
+import type {submitType} from './type'
 //通过枚举管理首页模块的接口地址
 enum API {
     // 修改用户个人简介
@@ -9,7 +11,7 @@ enum API {
     UPDATE_USER_NICKNAME = '/my/article/updateArtCateById'
 }
 // 修改用户个人简介
-export const putUserEmail = (name:string, region: string) => request({
+export const putUserEmail = (name:string, region: string) => request<string, submitType>({
     url: API.PUT_USER_EMAIL,
     method: 'post',
     data: qs.stringify({

@@ -6,6 +6,8 @@ import { putUserEmail, updateUserNickname } from '@/api/EditData'
 import { useRouter } from 'vue-router'
 // 引入 Element-plus message消息提示
 import { ElMessage } from 'element-plus'
+// 引入类型
+import type { submitType } from '@/api/EditData/type'
 // 注册路由构造器
 const $router = useRouter();
 let labelPosition = ref('top')
@@ -15,19 +17,17 @@ let formLabelAlign = reactive({
 })
 // 修改用户资料
 let submit = async () => {
-    const results = await putUserEmail(formLabelAlign.name, formLabelAlign.region);
-    if(results.status == 0) {
+    const results: submitType = await putUserEmail(formLabelAlign.name, formLabelAlign.region);
+    if (results.status == 0) {
         ElMessage({
             message: "修改成功！",
             type: "success",
             offset: 100
         })
-        const user_id = localStorage.getItem("userId")
-        const results = await updateUserNickname(user_id ,formLabelAlign.name)
-        console.log(results);
-        
+        const user_id = localStorage.getItem("userId");
+        await updateUserNickname(user_id, formLabelAlign.name)
         // 修改成功后跳转到个人主页
-        $router.push({name: 'PersonalCenter', query: {isGetUserInfo: "true"}})
+        $router.push({ name: 'PersonalCenter', query: { isGetUserInfo: "true" } })
     }
 }
 </script>
@@ -64,5 +64,4 @@ let submit = async () => {
     border-radius: 12px;
     opacity: .8;
 }
-
 </style>

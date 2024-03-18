@@ -7,15 +7,29 @@ const $router = useRouter()
 const $route = useRoute()
 // 引入 Element-plus message消息提示
 import { ElMessage } from 'element-plus'
+// 引入富文本插件
+// import '@wangeditor/editor/dist/css/style.css' // 引入 css
+// import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+// // 编辑器实例，必须用 shallowRef
+// const editorRef = shallowRef()
+// // 内容 HTML
+// const valueHtml = ref('')
+// const toolbarConfig = {}
+// const editorConfig = { placeholder: '请输入内容...' }
+// const handleCreated = (editor: any) => {
+//     editorRef.value = editor // 记录 editor 实例，重要！
+// }
 // 引入请求 api
 import {
     reqPublishArticle, reqPublishArticleAndCover, reqPublishArticleAndCoverDel, reqPutArticleList
     , reqPutArticleCover, reqPutArticleCoverNo
 } from '@/api/PublishArticle'
+// 引入类型
+import type {formLabelAlignType} from '@/api/PublishArticle/type'
 // 顶部对齐方式
 let labelPosition = ref<string>("top")
 // 表单数据
-let formLabelAlign: any = reactive({
+let formLabelAlign: formLabelAlignType = reactive({
     name: "",
     alias: "",
     type: [],
@@ -55,13 +69,12 @@ let handleFileUpload = (event: any) => {
 // 发布文章
 let tonSubmit = async () => {
     // 校验输入框是否为空
-    if (formLabelAlign.type == '' || formLabelAlign.name == '' || formLabelAlign.alias == '') {
-        ElMessage({
+    if (formLabelAlign.type.length == 0 || formLabelAlign.name == '' || formLabelAlign.alias == '') {
+        return ElMessage({
             message: '名字或类型或内容不允许为空！',
             type: 'error',
             offset: 100
         })
-        return;
     } else {
         // 获取用户昵称
         const nickname: any = localStorage.getItem("nickname")
@@ -98,16 +111,15 @@ let tonSubmit = async () => {
 }
 // 修改文章
 let putSubmit = async () => {
-    if (formLabelAlign.type == '' || formLabelAlign.name == '' || formLabelAlign.alias == '') {
-        ElMessage({
+    if (formLabelAlign.type.length == 0 || formLabelAlign.name == '' || formLabelAlign.alias == '') {
+        return ElMessage({
             message: '名字或类型或内容不允许为空！',
             type: 'error',
             offset: 100
         })
-        return;
     } else {
         const type = formLabelAlign.type.join("，");
-        const id: any = $route.query.id;
+        const id: string = $route.query.id as string;
         await reqPutArticleList(formLabelAlign.name, formLabelAlign.alias, type, id)
         if (file.value != null) {
             // 根据id修改封面url
@@ -139,18 +151,30 @@ onMounted(() => {
     }
     // 点击编辑跳转过来让点击的标题、类型、文章赋值给现在的显示
     if ($route.query.name && $route.query.type && $route.query.alias) {
-        formLabelAlign.name = $route.query.name;
-        formLabelAlign.type.push($route.query.type);
-        formLabelAlign.alias = $route.query.alias;
+        formLabelAlign.name = $route.query.name as string;
+        formLabelAlign.type.push($route.query.type as string);
+        formLabelAlign.alias = $route.query.alias as string;
     }
     // 动态修改网页标题
     document.title = title.value;
 })
+// 组件销毁时，也及时销毁编辑器
+// onBeforeUnmount(() => {
+//     const editor = editorRef.value
+//     if (editor == null) return
+//     editor.destroy()
+// })
 </script>
 <template>
     <div class="main_bg"></div>
     <!-- 返回上一级 -->
     <GoBack color="red" :content="title" width="1200px" class="go_back" />
+    <!-- 富文本 -->
+    <!-- <div style="border: 1px solid #ccc">
+        <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig" :mode="mode" />
+        <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig" :mode="mode"
+            @onCreated="handleCreated" />
+    </div> -->
     <div class="main">
         <div class="container_bg"></div>
         <!-- 表单对齐方式 -->
@@ -204,7 +228,7 @@ onMounted(() => {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: 	#ccc;
+    background-color: #ccc;
     z-index: -1;
 }
 
@@ -214,9 +238,11 @@ onMounted(() => {
     margin: 20px auto;
     border-radius: 10px;
     background-size: cover;
+
     .file_container {
         display: flex;
         position: relative;
+
         // 上传图片后显示
         .image-preview {
             width: 300px;
@@ -224,6 +250,7 @@ onMounted(() => {
             margin-left: 50px;
             overflow: hidden;
         }
+
         .file {
             display: block;
             width: 200px;
@@ -258,28 +285,39 @@ onMounted(() => {
                 color: #fff;
             }
         }
+
         .file:hover {
             border-color: #409eff;
         }
     }
+
     // 文章内容
     /deep/ .el-form-item__label {
         color: #fff;
     }
+
+    /deep/ .el-textarea__inner {
+        height: 200px;
+    }
 }
+
 // 1300px
 @media screen and (max-width: 1300px) {
+
     // 主体
     .main {
         width: 1000px;
     }
+
     // 返回上一级
     .go_back {
         display: none;
     }
 }
+
 // 1100px
 @media screen and (max-width: 1100px) {
+
     // 主体
     .main {
         width: 800px;
@@ -297,23 +335,28 @@ onMounted(() => {
 
 // 768px
 @media screen and (max-width: 768px) {
-     // 主体
-     .main {
+
+    // 主体
+    .main {
         width: 500px;
     }
+
     // 上传封面
     .file {
         width: 150px !important;
         height: 150px !important;
     }
+
     .image-preview {
         width: 150px !important;
         height: 150px !important;
     }
+
     // 多选框字体
     /deep/ .el-checkbox__label {
         color: red;
     }
+
     // 文章内容提示
     /deep/ .el-form-item__label {
         color: #fff;
@@ -322,16 +365,18 @@ onMounted(() => {
 
 // 600px
 @media screen and (max-width: 600px) {
-     // 主体
-     .main {
+
+    // 主体
+    .main {
         width: 400px;
     }
 }
 
 // 500px
 @media screen and (max-width: 500px) {
-     // 主体
-     .main {
+
+    // 主体
+    .main {
         width: 300px;
     }
 }

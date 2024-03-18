@@ -2,7 +2,7 @@
 import request from "@/utils/request";
 import qs from 'qs'
 // 引入类型判断
-import { userType } from './type'
+import { userType, userAvatarType,userAvatarUrlType } from './type'
 //通过枚举管理首页模块的接口地址
 enum API {
     // 根据id获取用户头像url
@@ -14,7 +14,7 @@ enum API {
 }
 // 根据id获取用户头像url
 export const reqArticleCover = (id: string) => {
-    return request({
+    return request<string, userAvatarUrlType>({
         url: API.GET_ARTICLE_COVER,
         method: 'post',
         data: qs.stringify({
@@ -26,7 +26,7 @@ export const reqArticleCover = (id: string) => {
 export const userToken = () => request(API.USER_TOKEN) as Promise<userType>;
 // 用户更换头像
 export const unDateUserCover = (formData: any) => {
-    return request.post(API.UPDATE_USER_COVER, formData, {
+    return request.post<string, userAvatarType>(API.UPDATE_USER_COVER, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
           },
