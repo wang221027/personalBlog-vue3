@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted, computed, reactive, Ref } from "vue";
 // 引入api
-import { reqArticle, reqArticleCoverData, reqUserComment } from '@/api/home';
+import { reqArticle, reqArticleCoverData, reqUserComment, reqUserLike } from '@/api/home';
 // 引入类型
 import type { isArticleData, articleListData, isArticleCoverType, coverData, userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
@@ -42,13 +42,13 @@ const getArticle = async () => {
     isInit.value = true;
     // 获取用户所有评论
     getUserComment();
-    // 每次刷新都随机展示数据
-    randomDisplay(randomArticles.value)
-    randomDisplay(reqArticles.value)
 }
 // 获取文章列表封面url
 const getArticleCover = async () => {
     const result: isArticleCoverType = await reqArticleCoverData();
+    // 每次刷新都随机展示数据
+    randomDisplay(randomArticles.value)
+        randomDisplay(reqArticles.value)
     if (result.data.length > 0) {
         articleCover.value = result.data;
         if (articleCover.value.length > 0) {
@@ -117,6 +117,30 @@ let computedUserComment = computed(() => (id: number) => {
         return userComment.filter((element: any) => element.commentId == id)
     }
 })
+// 点赞
+const like = async (id: number) => {
+    await reqUserLike(id, localStorage.getItem("nickname") as string);
+    getArticle();
+}
+// 过滤出点赞数量
+const computedLike = computed(() => (likeList: any) => {
+    let likeArr = JSON.parse(likeList)
+    if (likeArr) {
+        let result = likeArr.filter((element: any) => element.is_like == true)
+        return result.length;
+    }
+})
+const isLike = computed(() => (likeList: any) => {
+    let likeArr = JSON.parse(likeList)
+    if (likeArr) {
+        let result = likeArr.filter((element: any) => element.nickname == localStorage.getItem("nickname"))
+        if(result.length > 0) {
+            return result[0].is_like;
+        }else {
+            return false;
+        }
+    }
+})
 // 在页面渲染完成后获取数据
 onMounted(() => {
     // 获取文章数据
@@ -179,7 +203,11 @@ onMounted(() => {
                                     <div style="display: flex;justify-content: space-between;">
                                         <p>作者：{{ item.nickname }}</p>
                                         <div style="font-size: 14px;display: flex;align-items: center;">
-                                            <ChatDotRound style="width: 16px;" />
+                                            <span class="iconfont icon-dianzan" style="cursor: pointer;"
+                                                @click="like(item.id)"
+                                                :style="{ color: isLike(item.likeList) == true ? 'red' : '' }"></span>
+                                            ({{ computedLike(item.likeList) }})
+                                            <ChatDotRound style="width: 16px;margin-left: 10px;" />
                                             ({{ isUserCommentBlock && computedUserComment(item.id)?.length || 0 }})
                                         </div>
                                     </div>

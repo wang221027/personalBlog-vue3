@@ -27,14 +27,14 @@ const init = () => {
                     data: ['总数']
                 },
                 xAxis: {
-                    data: ['用户', '文章列表', '聊天室', '裤子', '高跟鞋', '袜子']
+                    data: ['用户', '文章列表', '聊天室', '聊天室用户']
                 },
                 yAxis: {},
                 series: [
                     {
                         name: '总数',
                         type: 'bar',
-                        data: [userDataLength, userDataListLength, userSocketLength, 10, 10, 20]
+                        data: [userDataLength, userDataListLength, userSocketLength, 10]
                     }
                 ]
             };

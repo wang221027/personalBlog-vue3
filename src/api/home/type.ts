@@ -17,6 +17,7 @@ export type articleListData = {
   time: string;
   type: string;
   user_id: string;
+  likeList: any
 };
 export interface isArticleData extends sameType {
   data: articleListData[];
