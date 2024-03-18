@@ -6,8 +6,11 @@ import { reqArticle, reqArticleCoverData, reqUserComment, reqUserLike } from '@/
 import type { isArticleData, articleListData, isArticleCoverType, coverData, userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
 import { useRouter } from 'vue-router';
+// 引入bus
+import $bus from '@/utils/event-bus'
 // 引入字体图标样式
 import '@/pages/MyHome/font/iconfont.css';
+import { ElMessage } from "element-plus";
 const $router = useRouter();
 // 文章列表数据
 let articleData: Ref<articleListData[]> = ref([]);
@@ -119,6 +122,13 @@ let computedUserComment = computed(() => (id: number) => {
 })
 // 点赞
 const like = async (id: number) => {
+    if(!localStorage.getItem("token")) {
+        return ElMessage({
+            message: '登录后解锁点赞功能！',
+            type: 'error',
+            offset: 100
+        })
+    }
     await reqUserLike(id, localStorage.getItem("nickname") as string);
     getArticle();
 }
@@ -148,6 +158,9 @@ onMounted(() => {
     getArticle();
     // 获取文章列表封面url
     getArticleCover();
+    $bus.on("reqLike", () => {
+        getArticle();
+    })
 });
 </script>
 <template>

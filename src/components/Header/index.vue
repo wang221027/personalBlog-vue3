@@ -115,6 +115,7 @@ let goPersonalCenter = () => {
 // 退出登录
 let quit = () => {
     localStorage.clear();
+    $bus.emit("reqLike")
     ElMessage({
         message: `退出成功`,
         type: 'success',
