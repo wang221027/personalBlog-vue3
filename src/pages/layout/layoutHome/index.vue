@@ -65,7 +65,7 @@ onMounted(() => {
 </script>
 <template>
     <div class="title">
-        <p>主人 <br>欢迎回来！</p>
+        <p>admin <br>欢迎回来！</p>
     </div>
     <section>
         <div ref="main" style="width: 100%; height: 400px;margin-top: 20px;"></div>
@@ -75,6 +75,8 @@ onMounted(() => {
 .title {
     padding: 20px;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
     p {
         color: green;
         font-weight: 600;
@@ -82,13 +84,10 @@ onMounted(() => {
 }
 section {
     width: 100%;
-
     /deep/ canvas {
         width: 100% !important;
     }
-
     /deep/ div:nth-child(1) {
         width: 100% !important;
     }
-}
-</style>
+}</style>

@@ -197,14 +197,21 @@ onBeforeUnmount(() => {
     <div class="header">
         <!-- 固定定位大盒子 -->
         <div class="position_fixed"
-            :style="{ height: isBoxActive ? '60px' : '', background: isBoxActive ? '#BFEFFF' : '' }">
+            :style="{ height: isBoxActive ? '60px' : '', background: isBoxActive ? '#fff' : '' }">
             <!-- 导航栏 -->
             <div class="nav">
                 <!-- 列表 -->
                 <ul>
                     <li><router-link to="/home"><img src="./images/logo.png" alt=""></router-link></li>
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
-                    <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
+                    <li>
+                        <router-link to="/ChatRoom"><el-link type="success">聊天室
+                            <img src="https://cdn.duanliang920.com/uploads/menu/2023-05-1/78065519.gif"
+                                style="position:absolute;width: 20px;top: -11px;right: -10px;"
+                            >
+                            </el-link>
+                        </router-link>
+                    </li>
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
                     <li><router-link to="/adminLogin"><el-link type="success">后台管理系统</el-link></router-link></li>
                     <li>
@@ -283,9 +290,8 @@ onBeforeUnmount(() => {
             // 列表
             ul {
                 display: flex;
-
                 li {
-
+                    position: relative;
                     // logo
                     a {
                         img {

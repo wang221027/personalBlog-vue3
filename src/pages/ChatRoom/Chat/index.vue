@@ -273,7 +273,7 @@ onMounted(() => {
                 <div style="display: flex;align-items: center;position: relative;">
                     <img :src="item.avatar" alt="">
                     <WarningFilled style="width: 14px;margin-left: 8px;color: red;position: absolute;left: 20px;top: -3px;"
-                        v-if="item.is_block == 'true' && item.name != socketStore.chatType">
+                        v-if="item.is_block == 'true' && item.name != socketStore.chatType && item.userName != socketStore.chatType">
                     </WarningFilled>
                     <div>
                         <span>{{ item.name }}<span class="on_line" v-show="item.is_delete == '0'"></span>
