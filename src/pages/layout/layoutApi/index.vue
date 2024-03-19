@@ -5,6 +5,8 @@ import useLayoutStore from '@/store/layout';
 const layoutStore = useLayoutStore();
 // 引入element-plus信息提示
 import { ElMessage } from 'element-plus';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 let apiList = reactive([
     {
         path: 'http://43.138.70.109:8010/viteList',
@@ -127,22 +129,21 @@ let apiList = reactive([
         title: '需要携带token'
     },
 ])
-const cloneText = (text: string) => {
-    navigator.clipboard.writeText(text)
-        .then(() => {
-            ElMessage({
-                message: '复制成功！',
-                type: 'success',
-                offset: 100
-            })
+const cloneText = async (text: string) => {
+    try {
+        await toClipboard(text);
+        ElMessage({
+            message: '复制成功！',
+            type: 'success',
+            offset: 100
         })
-        .catch(err => {
-            ElMessage({
-                message: err.message,
-                type: 'error',
-                offset: 100
-            })
-        });
+    } catch (e: any) {
+        ElMessage({
+            message: e.message,
+            type: 'error',
+            offset: 100
+        })
+    }
 }
 onMounted(() => {
     layoutStore.getArticle()
@@ -183,13 +184,16 @@ ul {
 
         div {
             padding: 0 10px;
+
             p {
                 cursor: pointer;
+
                 span {
                     color: green;
                     font-size: 14px;
                     font-weight: 600;
                 }
+
                 .method_span {
                     display: inline-block;
                     padding: 0 10px;
@@ -203,6 +207,7 @@ ul {
             }
         }
     }
+
     li:hover {
         background-color: #D1EEEE;
     }

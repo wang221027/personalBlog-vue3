@@ -43,8 +43,9 @@ let getUserToken = async () => {
             avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
             username: localStorage.getItem("username")
         }
-
         if (localStorage.getItem("avatarUrl") == 'undefined') {
+            console.log(localStorage.getItem("avatarUrl"));
+            
             connectSocket(data);
         } else {
             data.avatar = localStorage.getItem("avatarUrl") as string
@@ -217,7 +218,7 @@ let returnUser = () => {
 let watchAvatar = () => {
     let userId = localStorage.getItem("userId");
     let userAvatar = localStorage.getItem("avatarUrl");
-    if (isGet && userId) {
+    if (isGet && userId && userAvatar != 'undefined') {
         let filterElement: any = socketStore.userList.filter((element) => element.user_id == userId);
         if (filterElement && userAvatar != filterElement.avatar) {
             socket.emit("updateAvatar", userAvatar);
@@ -326,7 +327,7 @@ onMounted(() => {
         <div class="container_right_bottom">
             <!-- 功能分区 -->
             <div class="sectorization">
-                <span class="iconfont icon-xiaolian1" @click="isEmojiBlock = !isEmojiBlock"></span>
+                <span class="iconfont icon-xiaolian" @click="isEmojiBlock = !isEmojiBlock"></span>
                 <div class="is_hidden" v-show="isEmojiBlock">
                     <Picker :data="emojiIndex" set="twitter" @select="showEmoji" />
                 </div>

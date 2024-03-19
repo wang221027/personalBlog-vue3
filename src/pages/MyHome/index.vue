@@ -49,9 +49,7 @@ const getArticle = async () => {
 // 获取文章列表封面url
 const getArticleCover = async () => {
     const result: isArticleCoverType = await reqArticleCoverData();
-    // 每次刷新都随机展示数据
-    randomDisplay(randomArticles.value)
-        randomDisplay(reqArticles.value)
+
     if (result.data.length > 0) {
         articleCover.value = result.data;
         if (articleCover.value.length > 0) {
@@ -122,7 +120,7 @@ let computedUserComment = computed(() => (id: number) => {
 })
 // 点赞
 const like = async (id: number) => {
-    if(!localStorage.getItem("token")) {
+    if (!localStorage.getItem("token")) {
         return ElMessage({
             message: '登录后解锁点赞功能！',
             type: 'error',
@@ -145,9 +143,9 @@ const isLike = computed(() => (likeList: any) => {
     let likeArr = JSON.parse(likeList)
     if (likeArr) {
         let result = likeArr.filter((element: any) => element.nickname == localStorage.getItem("nickname"))
-        if(result.length > 0) {
+        if (result.length > 0) {
             return result[0].is_like;
-        }else {
+        } else {
             return false;
         }
     }
@@ -160,7 +158,12 @@ onMounted(() => {
     getArticleCover();
     $bus.on("reqLike", () => {
         getArticle();
-    })
+    });
+    setTimeout(() => {
+        // 每次刷新都随机展示数据
+        randomDisplay(randomArticles.value);
+        randomDisplay(reqArticles.value);
+    },100)
 });
 </script>
 <template>
