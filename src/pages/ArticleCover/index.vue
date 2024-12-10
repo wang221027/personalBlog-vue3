@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, reactive, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 const $route = useRoute()
 const $router = useRouter()
@@ -7,16 +7,19 @@ const $router = useRouter()
 import { ElMessage } from "element-plus";
 // 引入 根据id获取文章列表 api
 import { reqArticleList, reqUserNickName, reqUserMessageHead, reqComment, reqComments } from '@/api/ArticleCover'
+// 引入类型
+import type { articleListData, isArticleData, userCommentType, userCommentResultType } from '@/api/home/type'
+import type { ArticleUrlType } from '@/api/ArticleCover/type'
 // 存储根据id获取文章列表的数据
-let ArticleListData: any = ref([])
+let ArticleListData: Ref<articleListData[]> = ref([])
 // 存储用户头像 url
-let avatarUrl: any = ref(null)
+let avatarUrl = ref<string | null>(null)
 // 存储用户昵称
 let userNickName = ref('')
-let avatarUrl2: any = ref(null)
+let avatarUrl2 = ref<string>('')
 let userNickName2: any = ref('')
 // 存储用户发表评论的内容
-let userComments: any = ref([])
+let userComments: Ref<userCommentResultType[]> = ref([])
 // 用户评论是否显示
 let isComment = ref(false)
 // 存储当前文章列表的id
@@ -25,23 +28,25 @@ let articleCoverId: any = ref('')
 let defaultAvatar = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 // 发请求根据id获取文章列表数据
 let getInIdArticleList = async () => {
-    const id: any = $route.query.id;
-    const results: any = await reqArticleList(id)
+    const id: string = $route.query.id as string;
+    const results: isArticleData = await reqArticleList(id);
     ArticleListData.value = results.data;
     getAvatarUrl()
 }
 // 发请求根据id获取用户昵称
 let getUserNickName = async () => {
-    const id: any = $route.query.id;
+    const id: string = $route.query.id as string;
     if (id) {
-        const results: any = await reqUserNickName(id)
-        userNickName.value = results.data[0].nickname;
+        const results: isArticleData = await reqUserNickName(id)
+        if (results.status == 0) {
+            userNickName.value = results.data[0].nickname;
+        }
     }
 }
 // 发请求根据id获取用户头像
 let getAvatarUrl = async () => {
     if (ArticleListData && ArticleListData.value && ArticleListData.value.length > 0 && ArticleListData.value[0].user_id) {
-        const results = await reqUserMessageHead(ArticleListData.value[0].user_id)
+        const results: ArticleUrlType = await reqUserMessageHead(ArticleListData.value[0].user_id)
         if (results.data[0] && results.data[0].title_url) {
             avatarUrl.value = results.data[0].title_url;
         }
@@ -52,11 +57,20 @@ let goIssue = () => {
     $router.push({ name: 'article' })
 }
 // 评论
-let formLabelAlign: any = reactive({
+let formLabelAlign: { alias: string } = reactive({
     alias: "",
 })
+// 存储用户的token
+const token = localStorage.getItem("token") || ''
 // 发表评论 
 let publish = async () => {
+    if (token == '') {
+        return ElMessage({
+            message: '登录后解释评论功能！',
+            type: 'error',
+            offset: 180
+        })
+    }
     if (formLabelAlign.alias == '') {
         return ElMessage({
             message: '内容不允许为空',
@@ -67,8 +81,7 @@ let publish = async () => {
     if (avatarUrl2.value == 'undefined') {
         avatarUrl2.value = defaultAvatar;
     }
-    const results = await reqComment(formLabelAlign.alias, '0', avatarUrl2.value, userNickName2.value, articleCoverId.value,'')
-    console.log(results);
+    const results: userCommentType = await reqComment(formLabelAlign.alias, '0', avatarUrl2.value, userNickName2.value, articleCoverId.value, '')
     if (results.status == 0) {
         ElMessage({
             message: '发表成功！',
@@ -81,16 +94,22 @@ let publish = async () => {
         formLabelAlign.alias = ''
     }
 }
-
 // 获取所有评论
 let getComments = async () => {
-    const results = await reqComments()
+    const results: userCommentType = await reqComments()
     userComments.value = results.data;
     isComment.value = true;
 }
 let isCreate = ref(true)
 // 回复评论
 const addFormElement = (e: any) => {
+    if (token == '') {
+        return ElMessage({
+            message: '登录后解释评论功能！',
+            type: 'error',
+            offset: 180
+        })
+    }
     if (isCreate.value) {
         const html = `
             <div>
@@ -104,7 +123,7 @@ const addFormElement = (e: any) => {
     isCreate.value = false;
     const cancelBtn = document.querySelector('.cancel-btn');
     const publishBtn = document.querySelector('.publish-btn')
-    const commentText: any = document.querySelector(".comment-text")
+    const commentText: HTMLTextAreaElement | null = document.querySelector(".comment-text") as HTMLTextAreaElement;
     cancelBtn?.addEventListener('click', () => {
         const formElement = cancelBtn?.parentElement;
         formElement?.remove();
@@ -121,7 +140,7 @@ const addFormElement = (e: any) => {
         if (avatarUrl2.value == 'undefined') {
             avatarUrl2.value = defaultAvatar
         }
-        const results = await reqComment(commentText?.value, '1', avatarUrl2.value, userNickName2.value, articleCoverId.value,e.target.dataset.id)
+        const results: userCommentType = await reqComment(commentText?.value, '1', avatarUrl2.value, userNickName2.value, articleCoverId.value, e.target.dataset.id, e.target.dataset.nickname)
         if (results.status == 0) {
             ElMessage({
                 message: '发表成功！',
@@ -149,7 +168,7 @@ onMounted(() => {
     getComments()
     articleCoverId.value = $route.query.id
     // 从本地获取存储用户姓名和头像url
-    avatarUrl2.value = localStorage.getItem("avatarUrl")
+    avatarUrl2.value = localStorage.getItem("avatarUrl") as string;
     userNickName2.value = localStorage.getItem("nickname")
     isCreate.value = true;
 })
@@ -223,17 +242,20 @@ onMounted(() => {
                             <div style="margin-left: 50px;transform: translateY(-20px);">
                                 {{ item.alias }}
                             </div>
-                            <div @click="addFormElement" class="reply" :data-id="item.id" v-if="item.nickname != userNickName2"
-                            :data-nickname="item.nickname">回复</div>
+                            <div @click="addFormElement" class="reply" :data-id="item.id"
+                                v-if="item.nickname != userNickName2" :data-nickname="item.nickname">回复</div>
                             <!-- 回复评论展示 -->
                             <div v-for="item2 in userComments" :key="item2.id" v-if="isComment" style="margin-left: 50px;">
-                                <div v-if="item2.commentId == articleCoverId && item2.isReply == 1 && item.id == item2.userCommentId">
+                                <div
+                                    v-if="item2.commentId == articleCoverId && item2.isReply == 1 && item.id == item2.userCommentId">
                                     <div class="demo-type" style="display: flex;">
                                         <div>
                                             <el-avatar :src="item2.avatarUrl" />
                                         </div>
                                         <div style="margin-left: 10px;font-size: 14px;">
-                                            <span style="color: green;">{{ item2.nickname }}</span>回复<span style="color: salmon;">{{ item.nickname }}</span>
+                                            <span style="color: green;">{{ item2.nickname }}</span>回复<span
+                                                style="color: salmon;">{{ item2.otherUserNames == null ? item.nickname :
+                                                    item2.otherUserNames }}</span>
                                         </div>
                                         <div style="font-size: 12px;color: #111;margin-left: 10px;margin-top: 4px;">
                                             {{ item2.time }}
@@ -242,8 +264,8 @@ onMounted(() => {
                                     <div style="margin-left: 50px;transform: translateY(-20px);">
                                         {{ item2.alias }}
                                     </div>
-                                    <div @click="addFormElement" class="reply" :data-id="item.id" v-if="item2.nickname != userNickName2"
-                                    :data-nickname="item.nickname">回复</div>
+                                    <div @click="addFormElement" class="reply" :data-id="item.id"
+                                        v-if="item2.nickname != userNickName2" :data-nickname="item2.nickname">回复</div>
                                 </div>
                             </div>
                         </div>
@@ -257,7 +279,6 @@ onMounted(() => {
 // 容器
 .container {
     width: 100%;
-
     // 主体
     .main {
         width: 1400px;
@@ -309,6 +330,8 @@ onMounted(() => {
             padding: 20px;
             flex: 0.65;
             border: 1px solid #ccc;
+            box-sizing: border-box;
+
             // 回复
             .reply {
                 display: inline-block;
@@ -317,6 +340,7 @@ onMounted(() => {
                 font-size: 14px;
                 cursor: pointer;
             }
+
             h1 {
                 font-size: 30px;
                 margin: 10px 0;
@@ -404,23 +428,13 @@ onMounted(() => {
     .main {
         width: 600px !important;
     }
-}
 
-// 600px
-@media screen and (max-width: 650px) {
-
-    // 主体
-    .main {
-        width: 500px !important;
+    .main_left {
+        width: 100%;
     }
-}
 
-// 500px
-@media screen and (max-width: 500px) {
-
-    // 主体
-    .main {
-        width: 400px !important;
+    .main_right {
+        width: 100%;
     }
 }
 </style>

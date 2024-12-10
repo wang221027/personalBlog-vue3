@@ -11,17 +11,18 @@ import { GET_TOKEN } from '@/utils/user'
 // 引入 Element-plus message消息提示
 import { ElMessage } from 'element-plus'
 // 引入类型判断
-import type { userType } from '@/api/header/type'
+import type { userType, userAvatarType, userAvatarUrlType } from '@/api/header/type'
+import type { isArticleData } from '@/api/home/type'
 // 引入获取文章列表api
 import { reqArticle } from '@/api/home'
 // 获取路由器对象
 let $router = useRouter();
 // 登录注册按钮是否显示
-let isLoginAndRegisterShow: any = ref('true')
+let isLoginAndRegisterShow = ref<string>('true')
 // 用户头像是否显示
 let isShow = ref(false)
 // 存储用户头像url
-let avatarUrl = ref(null)
+let avatarUrl = ref('')
 // 用户选择的头像地址
 let file: any = ref(null)
 // 导航栏是否加类名
@@ -62,7 +63,6 @@ const createFilter = (queryString: string) => {
     }
 }
 const handleSelect = (item: Record<string, any>) => {
-    // console.log(item)
     $router.push({ name: 'cover', query: { id: item.link } })
     state.value = ''
 }
@@ -83,8 +83,8 @@ let getUserLogin = async () => {
     let token = GET_TOKEN();
     if (token) {
         const result: userType = await userToken();
-        const id: string = result.data.id.toString();
         if (result.status == 0) {
+            const id: string = result.data.id.toString();
             localStorage.setItem("userId", id)
             ElMessage({
                 message: `欢迎回来${result.data.nickname}`,
@@ -101,9 +101,9 @@ let getUserLogin = async () => {
 }
 // 发请求根据id获取用户头像url
 let getInIdArticleCover = async () => {
-    const id: any = localStorage.getItem("userId");
+    const id: string = localStorage.getItem("userId") as string;
     if (id) {
-        const results: any = await reqArticleCover(id)
+        const results: userAvatarUrlType = await reqArticleCover(id)
         avatarUrl.value = results.data[0]?.title_url;
         localStorage.setItem("avatarUrl", results.data[0]?.title_url)
     }
@@ -115,6 +115,7 @@ let goPersonalCenter = () => {
 // 退出登录
 let quit = () => {
     localStorage.clear();
+    $bus.emit("reqLike")
     ElMessage({
         message: `退出成功`,
         type: 'success',
@@ -122,7 +123,7 @@ let quit = () => {
     })
     $bus.emit("getUserId")
     setTimeout(() => {
-        $router.push({ name: 'HomePage' })
+        $router.push({ name: 'home' })
     }, 1000)
 }
 // 更换头像
@@ -137,8 +138,8 @@ let uploadAvatar = async () => {
     }
     let formData = new FormData();
     formData.append("avatar", file.value);
-    const results = await unDateUserCover(formData)
-    localStorage.setItem("avatarUrl", results.data[0].title_url)
+    const results: userAvatarType = await unDateUserCover(formData)
+    localStorage.setItem("avatarUrl", results.data[0] as string)
     getInIdArticleCover()
     $bus.emit("updateCoverUrl");
     $bus.emit("updateUserUrl")
@@ -155,7 +156,7 @@ let handleScroll = () => {
 }
 // 获取文章列表
 let getUserList = async () => {
-    const results = await reqArticle()
+    const results: isArticleData = await reqArticle()
     userListData.value = results.data;
     links.value = loadAll()
 }
@@ -164,7 +165,7 @@ onMounted(() => {
     getUserList()
     // 绑定事件
     $bus.on("isLoginShow", (bool) => {
-        isLoginAndRegisterShow.value = bool;
+        isLoginAndRegisterShow.value = bool as string;
     })
     // 判断是否有token，如果有就显示用户欢迎回来
     getUserLogin()
@@ -197,16 +198,23 @@ onBeforeUnmount(() => {
     <div class="header">
         <!-- 固定定位大盒子 -->
         <div class="position_fixed"
-            :style="{ height: isBoxActive ? '60px' : '', background: isBoxActive ? '#BFEFFF' : '' }">
+            :style="{ height: isBoxActive ? '60px' : '', background: isBoxActive ? '#fff' : '' }">
             <!-- 导航栏 -->
             <div class="nav">
                 <!-- 列表 -->
                 <ul>
                     <li><router-link to="/home"><img src="./images/logo.png" alt=""></router-link></li>
                     <li><router-link to="/home"><el-link type="success">文章</el-link></router-link></li>
-                    <li><router-link to="/ChatRoom"><el-link type="success">聊天室</el-link></router-link></li>
+                    <li>
+                        <router-link to="/ChatRoom"><el-link type="success">聊天室
+                            <img src="https://cdn.duanliang920.com/uploads/menu/2023-05-1/78065519.gif"
+                                style="position:absolute;width: 20px;top: -11px;right: -10px;"
+                            >
+                            </el-link>
+                        </router-link>
+                    </li>
                     <li><router-link to="/MessageBoard"><el-link type="success">留言板</el-link></router-link></li>
-                    <li><router-link to="/Community"><el-link type="success">社区</el-link></router-link></li>
+                    <li><router-link to="/adminLogin"><el-link type="success">后台管理系统</el-link></router-link></li>
                     <li>
                         <a href="https://github.com/wang221027/vue3-ts-vite.git" target="_blank">
                             <el-link type="success">GitHub<el-icon>
@@ -257,6 +265,7 @@ onBeforeUnmount(() => {
 .header {
     width: 100%;
     height: 80px;
+
     // 固定定位大盒子
     .position_fixed {
         position: fixed;
@@ -282,9 +291,8 @@ onBeforeUnmount(() => {
             // 列表
             ul {
                 display: flex;
-
                 li {
-
+                    position: relative;
                     // logo
                     a {
                         img {
@@ -707,4 +715,5 @@ onBeforeUnmount(() => {
 .goArticle button:hover .text,
 .goArticle button.active .text {
     animation: text .66s ease-in 1 both;
-}</style>
+}
+</style>

@@ -3,5 +3,6 @@ export interface USER_API {
     message: string,
     status: number,
     token: string,
-    nickname: string
+    nickname: string,
+    username: string
 }

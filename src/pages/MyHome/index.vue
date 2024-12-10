@@ -1,28 +1,39 @@
 <script setup lang='ts'>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, reactive, Ref } from "vue";
 // 引入api
-import { reqArticle, reqArticleCoverData } from '@/api/home'
+import { reqArticle, reqArticleCoverData, reqUserComment, reqUserLike } from '@/api/home';
 // 引入类型
-import { isArticleData } from '@/api/home/type'
+import type { isArticleData, articleListData, isArticleCoverType, coverData, userCommentResultType, userCommentType } from '@/api/home/type'
 // 引入router构造器
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+// 引入bus
+import $bus from '@/utils/event-bus'
+// 引入字体图标样式
+import '@/pages/MyHome/font/iconfont.css';
+import { ElMessage } from "element-plus";
 const $router = useRouter();
 // 文章列表数据
-let articleData: any = ref([])
+let articleData: Ref<articleListData[]> = ref([]);
 // 文章列表是否显示
-let isInit = ref<boolean>(false)
+let isInit = ref<boolean>(false);
 // 文章列表封面是否显示
-let isArticleCover = ref<boolean>(false)
+let isArticleCover = ref<boolean>(false);
 // 文章列表总数量
-let total = ref<number>(0)
+let total = ref<number>(0);
 // 文章列表封面url
-let articleCover: any = ref([])
+let articleCover: Ref<coverData[]> = ref([]);
 // 分页器当前页码
-let currentPage = ref(1)
+let currentPage = ref(1);
 // 分页器一页显示几个
-let pageSize = ref(10)
+let pageSize = ref(10);
 // 计算是否显示后的总数量
-let totalSplice = ref(0)
+let totalSplice = ref(0);
+// 轮播图url
+const bannerUrl: string[] = reactive([
+    'http://43.138.70.109:8010/head/zhi.webp',
+    'http://43.138.70.109:8010/head/web.webp',
+    'http://43.138.70.109:8010/head/04.webp'
+])
 // 获取文章数据
 const getArticle = async () => {
     const result: isArticleData = await reqArticle();
@@ -32,14 +43,19 @@ const getArticle = async () => {
     });
     total.value = articleData.value.length;
     isInit.value = true;
-    // 每次刷新都随机展示数据
-    randomDisplay()
+    // 获取用户所有评论
+    getUserComment();
 }
 // 获取文章列表封面url
 const getArticleCover = async () => {
-    const result: any = await reqArticleCoverData();
-    articleCover = result.data
-    isArticleCover.value = true;
+    const result: isArticleCoverType = await reqArticleCoverData();
+
+    if (result.data.length > 0) {
+        articleCover.value = result.data;
+        if (articleCover.value.length > 0) {
+            isArticleCover.value = true;
+        }
+    }
 }
 // 点击标题跳转到对应的文章详情
 let goArticleCover = (id: number) => {
@@ -73,9 +89,11 @@ let paginationList = computed(() => {
     }
     return list;
 })
-const randomArticles: any = ref([]);
-const randomDisplay = () => {
-    const randomIndexes: any = [];
+// 随机展示10条文章列表
+const randomArticles: Ref<articleListData[]> = ref([]);
+const reqArticles: Ref<articleListData[]> = ref([])
+const randomDisplay = (data: any) => {
+    const randomIndexes: number[] = [];
     const articles = articleData.value;
     while (randomIndexes.length < articles.length) {
         const randomIndex = Math.floor(Math.random() * articles.length);
@@ -84,25 +102,99 @@ const randomDisplay = () => {
         }
     }
     randomIndexes.slice(0, 10).forEach((index: any) => {
-        randomArticles.value.push(articles[index]);
+        data.push(articles[index]);
     });
 }
+// 获取用户所有评论
+let userComment: userCommentResultType[] = reactive([])
+let isUserCommentBlock = ref(false)
+let getUserComment = async () => {
+    const result: userCommentType = await reqUserComment();
+    userComment = result.data;
+    isUserCommentBlock.value = true;
+}
+let computedUserComment = computed(() => (id: number) => {
+    if (userComment) {
+        return userComment.filter((element: any) => element.commentId == id)
+    }
+})
+// 点赞
+const like = async (id: number) => {
+    if (!localStorage.getItem("token")) {
+        return ElMessage({
+            message: '登录后解锁点赞功能！',
+            type: 'error',
+            offset: 100
+        })
+    }
+    await reqUserLike(id, localStorage.getItem("nickname") as string);
+    getArticle();
+}
+// 过滤出点赞数量
+const computedLike = computed(() => (likeList: any) => {
+    let likeArr = JSON.parse(likeList)
+    if (likeArr) {
+        let result = likeArr.filter((element: any) => element.is_like == true)
+        return result.length;
+    }
+})
+// 点赞高亮是否显示
+const isLike = computed(() => (likeList: any) => {
+    let likeArr = JSON.parse(likeList)
+    if (likeArr) {
+        let result = likeArr.filter((element: any) => element.nickname == localStorage.getItem("nickname"))
+        if (result.length > 0) {
+            return result[0].is_like;
+        } else {
+            return false;
+        }
+    }
+})
 // 在页面渲染完成后获取数据
 onMounted(() => {
     // 获取文章数据
     getArticle();
     // 获取文章列表封面url
     getArticleCover();
-
+    $bus.on("reqLike", () => {
+        getArticle();
+    });
+    setTimeout(() => {
+        // 每次刷新都随机展示数据
+        randomDisplay(randomArticles.value);
+        randomDisplay(reqArticles.value);
+    },100)
 });
 </script>
 <template>
+    <header>
+        <section class="header_banner">
+            <el-carousel :interval="5000" arrow="always">
+                <el-carousel-item v-for="item in bannerUrl">
+                    <img :src="item" alt="">
+                </el-carousel-item>
+            </el-carousel>
+        </section>
+        <section class="header_content">
+            <img src="http://43.138.70.109:8010/head/hei.jpg" alt="">
+            <p>
+                <span style="color: #ceefea;">前端/移动开发</span><br>Node.js <br>
+                MySQL
+            </p>
+        </section>
+    </header>
     <!-- 主体 -->
     <main>
         <div class="main">
             <div class="flex">
                 <!-- 左边文章 -->
                 <div class="main_left">
+                    <div style="border-bottom: 1px solid #ccc;margin: 10px 0;">
+                        <span
+                            style="font-size: 24px;border-bottom: 2px solid #0d6cbf;padding-bottom: 10px;display: inline-block">
+                            最新文章
+                        </span>
+                    </div>
                     <!-- 文章列表 -->
                     <ul class="list">
                         <li v-for="(item) in showDataList" :key="item.id">
@@ -115,15 +207,27 @@ onMounted(() => {
                                     backgroundRepeat: 'no-repeat'
                                 }" v-if="isArticleCover && articleCover[item.id - 1].file == 'show'"></div>
                                 <!-- 文章详情 -->
-                                <div class="list_right" v-if="isArticleCover" @click="goArticleCover(item.id)"
+                                <div class="list_right" v-if="isArticleCover"
                                     :style="{ flex: articleCover[item.id - 1].file == 'show' ? '0.65' : '1' }">
-                                    <el-link type="info" class="list_right_title">{{ item.name }}</el-link>
-                                    <p class="article">{{ item.alias }}</p>
+                                    <el-link type="info" class="list_right_title" @click="goArticleCover(item.id)">{{
+                                        item.name }}</el-link>
+                                    <p class="article" style="cursor: pointer;" @click="goArticleCover(item.id)">{{
+                                        item.alias }}</p>
                                     <div>
-                                        <p>类型：{{ item.type }}</p>
+                                        <p style="max-width: 72%;">类型：{{ item.type }}</p>
                                         <p>发布日期：{{ item.time }}</p>
                                     </div>
-                                    <p>作者：{{ item.nickname }}</p>
+                                    <div style="display: flex;justify-content: space-between;">
+                                        <p>作者：{{ item.nickname }}</p>
+                                        <div style="font-size: 14px;display: flex;align-items: center;position: relative;">
+                                            <span class="iconfont icon-dianzan" style="cursor: pointer;"
+                                                @click="like(item.id)"
+                                                :style="{ color: isLike(item.likeList) == true ? 'red' : '' }"></span>
+                                            <span>{{ computedLike(item.likeList) || 0 }}</span>赞
+                                            <ChatDotRound style="width: 16px;margin-left: 30px;" />
+                                            ({{ isUserCommentBlock && computedUserComment(item.id)?.length || 0 }})
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -145,6 +249,21 @@ onMounted(() => {
                             <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
                         </li>
                     </ul>
+                    <div>
+                        <div class="title" style="border-bottom: 1px solid #ccc;margin: 10px 0;">
+                            <span
+                                style="font-size: 24px;border-bottom: 2px solid #0d6cbf;padding-bottom: 10px;display: inline-block">热门推荐</span>
+                        </div>
+                        <!-- 热门推荐 -->
+                        <ul class="random_list">
+                            <li v-for="(item, index) in reqArticles">
+                                <span
+                                    :style="{ backgroundColor: index == 0 ? 'red' : index == 1 ? 'green' : index == 2 ? '#ffad38' : '#ccc' }">{{
+                                        index + 1 }}</span>
+                                <a href="javascript:;" @click="goArticleCover(item.id)">{{ item.name }}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <!-- 分页器 -->
@@ -168,7 +287,6 @@ onMounted(() => {
             </div>
         </div>
     </main>
-
     <Bottom class="bottom" />
 </template>
 <style lang='less' scoped>
@@ -176,6 +294,59 @@ onMounted(() => {
 .flex {
     display: flex;
     justify-content: space-between;
+}
+
+// 头部
+header {
+    width: 1100px;
+    display: flex;
+    justify-content: space-between;
+    margin: 40px auto;
+
+    // 轮播图
+    .header_banner {
+        flex: .5;
+
+        .el-carousel__item h3 {
+            color: #475669;
+            opacity: 0.75;
+            line-height: 300px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .el-carousel__item:nth-child(2n) {
+            background-color: #99a9bf;
+        }
+
+        .el-carousel__item:nth-child(2n + 1) {
+            background-color: #d3dce6;
+        }
+
+        img {
+            display: block;
+            width: 100%;
+            height: 300px;
+        }
+    }
+
+    .header_content {
+        flex: .4;
+        position: relative;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        p {
+            transform: translate(180px, 120px);
+            color: #f7b0b0;
+            font-size: 14px;
+        }
+    }
 }
 
 // 主体
@@ -270,6 +441,7 @@ main {
                     text-overflow: ellipsis;
                     /* 使用省略号表示被隐藏的文本内容 */
                     white-space: nowrap;
+
                     /* 防止文本换行 */
                     span {
                         display: inline-block;
@@ -371,6 +543,24 @@ main {
     /deep/ .el-carousel .el-carousel__button {
         width: 20px;
     }
+
+    // 右侧装饰
+    .main_right {
+        width: 300px;
+    }
+
+    // 头部
+    header {
+        width: 800px;
+    }
+
+    /deep/ .el-carousel__container {
+        height: 250px;
+    }
+
+    header img {
+        height: 250px;
+    }
 }
 
 // 1100px
@@ -380,6 +570,29 @@ main {
     .main,
     .demo-tabs {
         width: 800px;
+    }
+
+    // 右侧装饰
+    .main_right {
+        width: 260px;
+    }
+
+    // 头部
+    header {
+        width: 700px;
+    }
+
+    /deep/ .el-carousel__container {
+        height: 200px;
+    }
+
+    header img {
+        height: 200px;
+    }
+
+    // 顶部右侧文字
+    header .header_content p {
+        transform: translate(105px, 89px);
     }
 }
 
@@ -429,6 +642,7 @@ main {
 
     // 左边内容
     .main_left {
+        width: 300px;
         flex: 1 !important;
     }
 
@@ -471,6 +685,11 @@ main {
     .page_bottom,
     .page_top {
         display: none !important;
+    }
+
+    // 头部
+    header {
+        display: none;
     }
 }
 

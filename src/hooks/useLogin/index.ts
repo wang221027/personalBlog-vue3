@@ -26,6 +26,7 @@ export default function () {
       SET_TOKEN(results.token);
       localStorage.setItem("userId", results.id);
       localStorage.setItem("nickname", results.nickname);
+      localStorage.setItem("username", results.username);
       $bus.emit("isLoginShow", "false");
       ElMessage({
         message: `欢迎回来${results.nickname}`,
@@ -49,7 +50,7 @@ export default function () {
     $router.push({ name: "register" });
   };
   onMounted(() => {
-    const getUsername: any = $route.query.username;
+    const getUsername: string = $route.query.username as string;
     if (getUsername) {
       username.value = getUsername;
     }
